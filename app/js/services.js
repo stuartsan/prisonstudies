@@ -2,8 +2,13 @@
 
 /* Services */
 
+var prisonDataServices = angular.module('prisonDataServices', ['ngResource']);
 
-// Demonstrate how to register services
-// In this case it is a simple value service.
-angular.module('myApp.services', []).
-  value('version', '0.1');
+
+// Returns function with a query method that returns all country data
+prisonDataServices.factory('Country', ['$resource',
+  function($resource){
+    return $resource('data.json', {}, {
+      query: {method:'GET', isArray:true, cache:true}
+    });
+  }]);

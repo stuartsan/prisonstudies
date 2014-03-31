@@ -1,0 +1,25 @@
+<div id="countries">
+  <input type="text" ng-model="textBox" placeholder="Start typing a country name..." />
+  <span>Sort by:</span>
+  <select ng-model="order">
+    <option value="total_prisoners">Total prisoners</option>
+    <option value="female_prisoners">Female prisoners</option>
+  </select>
+  <span>From:</span>
+  <select ng-model="descending">
+    <option value="true">Highest</option>
+    <option value="false">Lowest</option>
+  </select>
+  <ul>
+    <li ng-repeat="country in countries | filter:{name: textBox} | orderBy:order:descending">
+      <h2>{{ country.name }}</h2>
+      <table>
+        <tr><th>Total prisoners:</th><td>{{ country.total_prisoners | formatInt }}</td></tr>
+        <tr><th>Prison population rate:</th><td>{{ country.prison_pop_rate | formatInt | formatPer100k }}</td></tr>
+        <tr><th>Female prisoners:</th><td>{{ country.female_prisoners | formatPercentage }}</td></tr>
+        <tr><th>Occupancy level:</th><td>{{ country.occupancy_level | formatPercentage }}</td></tr>
+        <tr><td><a ng-href="{{country.pso_url}}" target="_blank">PSO link</a></td></tr>
+      </table>
+    </li>
+  </ul>
+</div>

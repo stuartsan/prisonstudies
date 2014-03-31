@@ -1,25 +1,22 @@
-<!doctype html>
-<html lang="en" ng-app="myApp">
+<!DOCTYPE html>
+<html ng-app="prisonDataApp" ng-cloak>
 <head>
-  <meta charset="utf-8">
-  <title>My AngularJS App</title>
-  <link rel="stylesheet" href="css/app.css"/>
+  <title>Worldwide Incarceration Data</title>
+  <link rel="stylesheet" type="text/css" href="css/style.css">
 </head>
 <body>
-  <ul class="menu">
-    <li><a href="#/view1">view1</a></li>
-    <li><a href="#/view2">view2</a></li>
+  <h1>Take a look at some prison data!</h1>
+  <ul id="nav" ng-controller="navCtrl">
+    <li ng-class="setClass(paths.countryList)"><a ng-href="#{{paths.countryList}}">Country List</a></li>
+    <li ng-class="setClass(paths.map)"><a ng-href="#{{paths.map}}">Map</a></li>
   </ul>
-
   <div ng-view></div>
-
-  <div>Angular seed app: v<span app-version></span></div>
-
   <!-- In production use:
   <script src="//ajax.googleapis.com/ajax/libs/angularjs/x.x.x/angular.min.js"></script>
   -->
   <script src="../bower_components/angular/angular.js"></script>
   <script src="../bower_components/angular-route/angular-route.js"></script>
+  <script src="../bower_components/angular-resource/angular-resource.js"></script>
   <script src="js/app.js"></script>
   <script src="js/services.js"></script>
   <script src="js/controllers.js"></script>

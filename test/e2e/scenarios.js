@@ -1,42 +1,23 @@
 'use strict';
 
-/* https://github.com/angular/protractor/blob/master/docs/getting-started.md */
+/* https://github.com/angular/protractor/blob/master/docs/getting-started.md 
+ * also lots of good examples: 
+ * https://github.com/angular/protractor/blob/master/spec/basic/findelements_spec.js  
+ * and jasmine docs: http://jasmine.github.io/1.3/introduction.html
+ */
 
 describe('my app', function() {
 
   browser.get('index.html');
 
-  it('should automatically redirect to /view1 when location hash/fragment is empty', function() {
-    expect(browser.getLocationAbsUrl()).toMatch("/view1");
+  it('should redirect to /countries when location url fragment is empty', function() {
+    expect(browser.getLocationAbsUrl()).toMatch("/countries");
   });
 
-
-  describe('view1', function() {
-
-    beforeEach(function() {
-      browser.get('index.html#/view1');
-    });
-
-
-    it('should render view1 when user navigates to /view1', function() {
-      expect(element.all(by.css('[ng-view] p')).first().getText()).
-        toMatch(/partial for view 1/);
-    });
-
+  it('should switch to the map tab upon click', function() {
+    expect($('#map').isPresent()).toBe(false);
+    $('#nav li:nth-child(2) a').click();
+    expect($('#map').isPresent()).toBe(true);
   });
 
-
-  describe('view2', function() {
-
-    beforeEach(function() {
-      browser.get('index.html#/view2');
-    });
-
-
-    it('should render view2 when user navigates to /view2', function() {
-      expect(element.all(by.css('[ng-view] p')).first().getText()).
-        toMatch(/partial for view 2/);
-    });
-
-  });
 });

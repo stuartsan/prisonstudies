@@ -1,16 +1,26 @@
 'use strict';
 
 
-// Declare app level module which depends on filters, and services
-angular.module('myApp', [
-  'ngRoute',
-  'myApp.filters',
-  'myApp.services',
-  'myApp.directives',
-  'myApp.controllers'
-]).
-config(['$routeProvider', function($routeProvider) {
-  $routeProvider.when('/view1', {templateUrl: 'partials/partial1.html', controller: 'MyCtrl1'});
-  $routeProvider.when('/view2', {templateUrl: 'partials/partial2.html', controller: 'MyCtrl2'});
-  $routeProvider.otherwise({redirectTo: '/view1'});
+var prisonDataApp = angular.module('prisonDataApp', 
+	['prisonDataControllers',
+	'prisonDataServices',
+	'prisonDataFilters',
+	'ngRoute']
+);
+
+prisonDataApp.config(['$routeProvider', '$locationProvider', function($routeProvider, $locationProvider) {
+	$routeProvider
+		.when('/countries', {
+			templateUrl: 'partials/countries.html',
+			controller: 'CountryListCtrl'
+		})
+		.when('/map', {
+			templateUrl: 'partials/map.html',
+			controller: 'MapCtrl'
+		})
+		// .otherwise({
+		// 	redirectTo: '/countries'
+		// });
+
+	// $locationProvider.html5Mode(true); //do enable this
 }]);
