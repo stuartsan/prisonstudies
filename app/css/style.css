@@ -12,3 +12,7 @@
 #nav li.active {
 	background-color: #bbbbbb;
 }
+
+#map {
+	border: solid orange 2px;
+}

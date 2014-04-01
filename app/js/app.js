@@ -1,14 +1,14 @@
 'use strict';
 
 
-var prisonDataApp = angular.module('prisonDataApp', 
+var pdApp = angular.module('prisonDataApp', 
 	['prisonDataControllers',
 	'prisonDataServices',
 	'prisonDataFilters',
 	'ngRoute']
 );
 
-prisonDataApp.config(['$routeProvider', '$locationProvider', function($routeProvider, $locationProvider) {
+pdApp.config(['$routeProvider', '$locationProvider', function($routeProvider, $locationProvider) {
 	$routeProvider
 		.when('/countries', {
 			templateUrl: 'partials/countries.html',

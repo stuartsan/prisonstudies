@@ -14,10 +14,10 @@
     <li ng-repeat="country in countries | filter:{name: textBox} | orderBy:order:descending">
       <h2>{{ country.name }}</h2>
       <table>
-        <tr><th>Total prisoners:</th><td>{{ country.total_prisoners | formatInt }}</td></tr>
-        <tr><th>Prison population rate:</th><td>{{ country.prison_pop_rate | formatInt | formatPer100k }}</td></tr>
-        <tr><th>Female prisoners:</th><td>{{ country.female_prisoners | formatPercentage }}</td></tr>
-        <tr><th>Occupancy level:</th><td>{{ country.occupancy_level | formatPercentage }}</td></tr>
+        <tr><th>Total prisoners:</th><td>{{ country.total_prisoners | fmtInt | naify }}</td></tr>
+        <tr><th>Prison population rate:</th><td>{{ country.prison_pop_rate | fmtInt | fmtPer100k | naify }}</td></tr>
+        <tr><th>Female prisoners:</th><td>{{ country.female_prisoners | fmtPercent | naify }}</td></tr>
+        <tr><th>Occupancy level:</th><td>{{ country.occupancy_level | fmtPercent | naify }}</td></tr>
         <tr><td><a ng-href="{{country.pso_url}}" target="_blank">PSO link</a></td></tr>
       </table>
     </li>

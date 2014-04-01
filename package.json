@@ -1,10 +1,9 @@
 {
-  "name": "angular-seed",
+  "name": "prison-data",
+  "description": "Data visualization from prisonstudies.org",
   "private": true,
-  "version": "0.0.0",
-  "description": "A starter project for AngularJS",
-  "repository": "https://github.com/angular/angular-seed",
-  "license": "MIT",
+  "version": "0.0.1",
+  "repository": "https://github.com/stuartsan/prison-studies",
   "devDependencies": {
     "karma": "~0.10",
     "protractor": "~0.17.0",

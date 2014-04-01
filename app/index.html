@@ -5,7 +5,7 @@
   <link rel="stylesheet" type="text/css" href="css/style.css">
 </head>
 <body>
-  <h1>Take a look at some prison data!</h1>
+  <h1>Take a look at some <em>prison data!</em></h1>
   <ul id="nav" ng-controller="navCtrl">
     <li ng-class="setClass(paths.countryList)"><a ng-href="#{{paths.countryList}}">Country List</a></li>
     <li ng-class="setClass(paths.map)"><a ng-href="#{{paths.map}}">Map</a></li>
@@ -17,6 +17,8 @@
   <script src="../bower_components/angular/angular.js"></script>
   <script src="../bower_components/angular-route/angular-route.js"></script>
   <script src="../bower_components/angular-resource/angular-resource.js"></script>
+  <script src="../bower_components/d3/d3.js"></script>
+  <script src="../bower_components/topojson/topojson.js"></script>
   <script src="js/app.js"></script>
   <script src="js/services.js"></script>
   <script src="js/controllers.js"></script>

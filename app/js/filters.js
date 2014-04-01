@@ -2,22 +2,49 @@
 
 /* Filters */
 
-var prisonDataFilters = angular.module('prisonDataFilters', []);
+var pdFilters = angular.module('prisonDataFilters', []);
 
-prisonDataFilters.filter('formatPercentage', function () {
-	return function (num) {
-		return num != null ? num + '%' : 'N/A';
+function existy(x) {
+	return x != null;
+}
+
+function maybe(x, fn) {
+	if (!existy(x)) return x;
+	else return fn(x);
+}
+
+function append(x, y) {
+	return maybe(x, function() {
+		return x + y;
+	});
+}
+
+function replace(x, y, z) {
+	return maybe(x, function() {
+		return x.toString().replace(y, z);
+	});
+}
+
+pdFilters.filter('fmtPercent', function () {
+	return function (x) {
+		return append(x, '%')
 	}
 });
 
-prisonDataFilters.filter('formatInt', function () {
-	return function (num) {
-		return num != null ? num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : 'N/A';
+pdFilters.filter('fmtInt', function () {
+	return function (x) {
+		return replace(x, /\B(?=(\d{3})+(?!\d))/g, ",")
 	}
 });
 
-prisonDataFilters.filter('formatPer100k', function () {
-	return function (num) {
-		return (num != null && num !== 'N/A') ? num + ' per 100k' : 'N/A';
+pdFilters.filter('fmtPer100k', function () {
+	return function (x) {
+		return append(x, ' per 100k');
+	}
+});
+
+pdFilters.filter('naify', function () {
+	return function (x) {
+		return x || 'N/A';
 	}
 });
