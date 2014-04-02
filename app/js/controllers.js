@@ -17,32 +17,20 @@ pdControllers.controller('CountryListCtrl', ['$scope', 'Country', function($scop
 	$scope.countries = Country.query();
 }]);
 
-pdControllers.controller('MapCtrl', ['$scope', function($scope) {
-	var width = 960,
-    	height = 450;
+pdControllers.controller('MapCtrl', ['$scope', 'Country', 'countryCodeLookup', 'drawMapD3',
+function($scope, Country, countryCodeLookup, drawMapD3) {
 
-	var svg = d3.select('#map').append('svg')
-	    .attr('width', width)
-	    .attr('height', height);
-
-
-	d3.json('/app/theworld.json', function(err, world) {
-		console.log('doing it')
-		var countries = topojson.feature(world, world.objects.intermediate).features
-		var projection = d3.geo.mercator().scale(200);
-		var path = d3.geo.path().projection(projection);
-
-		svg.append("path")
-	      .datum(countries)
-	      .attr("d", path);
-
-	      svg.selectAll(".subunit")
-		    .data(countries)
-		  .enter().append("path")
-		    .attr("fill", function(d) { return '#'+Math.floor(Math.random()*16777215).toString(16); })
-		    .attr("d", path);
-	})
+	$scope.dimension = 'total_prisoners'; // Set default data dimension to visualize
+	$scope.data = null;	                  // Array of country data, not yet merged with country codes
+	$scope.hash = null; 				  // Provides country data lookup by country code
 	
+	$scope.data = Country.query(function(d) {
+		$scope.hash = d.reduce(function(acc, item) {
+			acc[countryCodeLookup[item.name]] = item;
+			return acc;
+		}, {});
+		$scope.drawMap($scope.data, $scope.hash, $scope.dimension);
+	});
 
-
+	$scope.drawMap = drawMapD3;	
 }]);

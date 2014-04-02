@@ -1,1 +1,13 @@
-<div id="map"></div>
+<div id="map">
+	<select type="text" ng-model="dimension" ng-change="drawMap(data, hash, dimension)">
+		<option value="total_prisoners">Total prisoners</option>
+		<option value="female_prisoners">% Female prisoners</option>
+		<option value="juveniles">$ Young'n prisoners</option>
+		<option value="official_capacity">Official capacity</option>
+		<option value="occupancy_level">% Occupancy level</option>
+		<option value="total_establishments">Total establishments</option>
+		<option value="foreign_prisoners">$ Foreign prisoners</option>
+		<option value="pretrial_detainee_rate">% Pretrial detainees</option>
+		<option value="prison_pop_rate">% Of people in country imprisoned</option>
+	</select>
+</div>
