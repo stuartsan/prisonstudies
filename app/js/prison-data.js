@@ -930,9 +930,21 @@ pdServices.factory('drawMapD3', function() {
 			return item[dimension];
 		});
 
-		var colorScale = d3.scale.linear().domain([min, max])
-			.range(['green', 'red']);
+		var domain;
 
+		switch(dimension) {
+			case 'total_prisoners':
+				domain = [25000,50000,100000,500000, 1000000];
+				break;
+			case 'female_prisoners':
+				domain = [1,2,4,7,14];
+				break;
+			default:
+				domain = [min, max]
+		}
+
+		var colorScale = d3.scale.threshold().domain(domain)
+			.range(['q0', 'q1', 'q2', 'q3', 'q4']);
 
 		var width = 1000,
 	    	height = 500;
@@ -953,7 +965,7 @@ pdServices.factory('drawMapD3', function() {
 	      svg.selectAll(".country")
 		    .data(countries)
 		  .enter().append("path")
-		    .attr("fill", function(d) { 
+		    .attr("class", function(d) { 
 		    	var pData = hash[d.properties.adm0_a3];
 		    	if (!pData) return 'grey';
 		    	return colorScale(pData[dimension]);
@@ -962,6 +974,7 @@ pdServices.factory('drawMapD3', function() {
 		});
 	};
 });
+
 
 pdServices.value('countryCodeLookup', {
 	"Afghanistan": "AFG",

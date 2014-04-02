@@ -5,12 +5,14 @@
   <link rel="stylesheet" type="text/css" href="app/css/style.css">
 </head>
 <body>
-  <h1>Take a look at some <em>prison data!</em></h1>
-  <ul id="nav" ng-controller="navCtrl">
-    <li ng-class="setClass(paths.countryList)"><a ng-href="#{{paths.countryList}}">Country List</a></li>
-    <li ng-class="setClass(paths.map)"><a ng-href="#{{paths.map}}">Map</a></li>
-  </ul>
-  <div ng-view></div>
-  <script src="app/js/prison-data.min.js"></script>
+  <div id="page">
+    <h1 id="site-title">Prison Data</em></h1>
+    <ul id="nav" ng-controller="navCtrl">
+      <li ng-class="setClass(paths.countryList)"><a ng-href="#{{paths.countryList}}">Country List</a></li>
+      <li ng-class="setClass(paths.map)"><a ng-href="#{{paths.map}}">Map</a></li>
+    </ul>
+    <div id="main" ng-view></div>
+  </div>
+  <script src="app/js/prison-data.js"></script>
 </body>
 </html>

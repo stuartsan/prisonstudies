@@ -1,24 +1,98 @@
+/*
+ * Variables
+ */
+/* Typography */
+/* Colors */
+/*
+ * General styles
+ */
+body {
+  background-color: black;
+  color: #3f3f3f;
+  font-family: helvetica, arial; }
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: courier;
+  font-weight: normal;
+  margin: 0.3em 0; }
+
+a:link, a:visited {
+  text-decoration: none;
+  color: black;
+  font-weight: bold; }
+
+input, textarea {
+  outline: none; }
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0; }
+
+#main {
+  background-color: #e5e5e5;
+  padding: 1em; }
+
+#site-title {
+  margin: 0.8em 0;
+  font-size: 2.5em;
+  color: #a5a5a5; }
+
 #nav {
   padding: 0;
+  margin: 0;
   list-style: none; }
   #nav li {
     display: inline-block;
-    padding-right: 1em;
-    background-color: #dddddd; }
+    border-top-left-radius: 0.3em;
+    border-top-right-radius: 0.3em;
+    padding: 0.5em 1em;
+    background-color: #f7f7f7; }
+    #nav li a {
+      display: block;
+      width: 100%;
+      height: 100%;
+      color: #404040; }
     #nav li.active {
-      background-color: #bbbbbb; }
+      background-color: #e5e5e5; }
+      #nav li.active a {
+        color: black; }
 
-#map {
-  border: solid orange 2px; }
-  #map .grey {
-    fill: gray; }
-  #map .q0 {
-    fill: #fef0d9; }
-  #map .q1 {
-    fill: #fdcc8a; }
-  #map .q2 {
-    fill: #fc8d59; }
-  #map .q3 {
-    fill: #e34a33; }
-  #map .q4 {
-    fill: #b30000; }
+.controls {
+  background-color: #bfbfbf;
+  padding: 0.7em 0.5em;
+  margin-bottom: 1em;
+  border-radius: 0.8em; }
+
+/*
+ * Country List
+ */
+#countries {
+  overflow: hidden; }
+  #countries input[type="text"] {
+    width: 20em; }
+  #countries .country {
+    padding: 0.8em;
+    margin: 0 1% 0.7em 0;
+    background-color: #cccccc;
+    float: left;
+    width: 30%;
+    height: 250px; }
+    #countries .country:nth-child(3n+3) {
+      margin-right: 0; }
+
+/*
+ * D3 map
+ */
+#map .grey {
+  fill: gray; }
+#map .q0 {
+  fill: #fef0d9; }
+#map .q1 {
+  fill: #fdcc8a; }
+#map .q2 {
+  fill: #fc8d59; }
+#map .q3 {
+  fill: #e34a33; }
+#map .q4 {
+  fill: #b30000; }

@@ -1,17 +1,19 @@
 <div id="countries">
-  <input type="text" ng-model="textBox" placeholder="Start typing a country name..." />
-  <span>Sort by:</span>
-  <select ng-model="order">
-    <option value="total_prisoners">Total prisoners</option>
-    <option value="female_prisoners">Female prisoners</option>
-  </select>
-  <span>From:</span>
-  <select ng-model="descending">
-    <option value="true">Highest</option>
-    <option value="false">Lowest</option>
-  </select>
+  <div class="controls">
+    <input type="text" ng-model="textBox" placeholder="Start typing a country name..." autofocus/>
+    <span>Sort by:</span>
+    <select ng-model="order">
+      <option value="total_prisoners">Total prisoners</option>
+      <option value="female_prisoners">Female prisoners</option>
+    </select>
+    <span>From:</span>
+    <select ng-model="descending">
+      <option value="true">Highest</option>
+      <option value="false">Lowest</option>
+    </select>
+  </div>
   <ul>
-    <li ng-repeat="country in countries | filter:{name: textBox} | orderBy:order:descending">
+    <li class="country" ng-repeat="country in filtered = (countries | filter:{name: textBox} | orderBy:order:descending)">
       <h2>{{ country.name }}</h2>
       <table>
         <tr><th>Total prisoners:</th><td>{{ country.total_prisoners | fmtInt | naify }}</td></tr>
@@ -21,5 +23,6 @@
         <tr><td><a ng-href="{{country.pso_url}}" target="_blank">Learn more</a></td></tr>
       </table>
     </li>
+    <li ng-hide="filtered.length">No matching countries.</li>
   </ul>
 </div>
