@@ -41,7 +41,7 @@ module.exports = function(grunt) {
 				tasks: 'concat:build'
 			},
 			html: {
-				files: 'app/**/*.html'
+				files: ['index.html', 'app/**/*.html']
 			}
 		}
 	});
@@ -51,5 +51,5 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-watch');
 
 	grunt.registerTask('default', ['concat:build', 'sass:build']);
-	
+
 };

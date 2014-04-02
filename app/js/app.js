@@ -1,7 +1,5 @@
 'use strict';
 
-console.log('hisi')
-
 var pdApp = angular.module('prisonDataApp', 
 	['prisonDataControllers',
 	'prisonDataServices',
@@ -12,11 +10,11 @@ var pdApp = angular.module('prisonDataApp',
 pdApp.config(['$routeProvider', '$locationProvider', function($routeProvider, $locationProvider) {
 	$routeProvider
 		.when('/countries', {
-			templateUrl: 'partials/countries.html',
+			templateUrl: '/app/partials/countries.html',
 			controller: 'CountryListCtrl'
 		})
 		.when('/map', {
-			templateUrl: 'partials/map.html',
+			templateUrl: '/app/partials/map.html',
 			controller: 'MapCtrl'
 		})
 		// .otherwise({

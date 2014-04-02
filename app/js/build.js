@@ -785,8 +785,6 @@ function(){this.$get=function(){return{}}});n.directive("ngView",x);n.directive(
 
 'use strict';
 
-console.log('hisi')
-
 var pdApp = angular.module('prisonDataApp', 
 	['prisonDataControllers',
 	'prisonDataServices',
@@ -797,11 +795,11 @@ var pdApp = angular.module('prisonDataApp',
 pdApp.config(['$routeProvider', '$locationProvider', function($routeProvider, $locationProvider) {
 	$routeProvider
 		.when('/countries', {
-			templateUrl: 'partials/countries.html',
+			templateUrl: '/app/partials/countries.html',
 			controller: 'CountryListCtrl'
 		})
 		.when('/map', {
-			templateUrl: 'partials/map.html',
+			templateUrl: '/app/partials/map.html',
 			controller: 'MapCtrl'
 		})
 		// .otherwise({
@@ -917,7 +915,7 @@ var pdServices = angular.module('prisonDataServices', ['ngResource']);
 // Returns function with a query method that returns all country data
 pdServices.factory('Country', ['$resource',
   function($resource){
-    return $resource('data.json', {}, {
+    return $resource('app/data.json', {}, {
       query: {method:'GET', isArray:true, cache:true}
     });
   }]);
