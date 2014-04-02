@@ -15,7 +15,8 @@
     "browserify": "^3.38.0",
     "grunt-browserify": "^2.0.1",
     "grunt-contrib-concat": "^0.4.0",
-    "grunt-contrib-watch": "^0.6.1"
+    "grunt-contrib-watch": "^0.6.1",
+    "grunt-contrib-uglify": "^0.4.0"
   },
   "scripts": {
     "postinstall": "bower install",

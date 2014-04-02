@@ -16,8 +16,17 @@ module.exports = function(grunt) {
 					'app/js/filters.js',
 					'app/js/services.js'
 				],
-				dest: 'app/js/build.js'
+				dest: 'app/js/<%= pkg.name %>.js'
 			},
+		},
+		uglify: {
+			options: {
+        		banner: '/*! <%= pkg.name %> <%= grunt.template.today("dd-mm-yyyy") %> */\n'
+      		},
+			build: {
+				src: '<%= concat.build.dest  %>',
+				dest: 'app/js/<%= pkg.name %>.min.js'
+			}
 		},
 		sass: {
 			build: {
@@ -38,7 +47,7 @@ module.exports = function(grunt) {
 			},
 			js: {
 				files: ['app/js/**/*.js', '!app/js/build.js'],
-				tasks: 'concat:build'
+				tasks: ['concat:build']
 			},
 			html: {
 				files: ['index.html', 'app/**/*.html']
@@ -49,7 +58,9 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-concat');
 	grunt.loadNpmTasks('grunt-sass');
 	grunt.loadNpmTasks('grunt-contrib-watch');
+	grunt.loadNpmTasks('grunt-contrib-uglify');
 
 	grunt.registerTask('default', ['concat:build', 'sass:build']);
+	grunt.registerTask('prod', ['concat:build', 'uglify:build', 'sass:build'])
 
 };
