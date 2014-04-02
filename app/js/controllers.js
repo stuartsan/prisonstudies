@@ -1,3 +1,4 @@
+(function () {		
 'use strict';
 
 /* Controllers */
@@ -8,12 +9,12 @@ pdControllers.controller('navCtrl', ['$scope', '$location', function($scope, $lo
 	$scope.paths = { countryList: 'countries', map: 'map' };
 	$scope.setClass = function(path) {
 		return $location.path().slice(1) === path ? 'active' : '';
-	}
+	};
 }]);
 
 pdControllers.controller('CountryListCtrl', ['$scope', 'Country', function($scope, Country){
-	$scope.order = 'total_prisoners'
-	$scope.descending = true
+	$scope.order = 'total_prisoners';
+	$scope.descending = true;
 	$scope.countries = Country.query();
 }]);
 
@@ -34,3 +35,4 @@ function($scope, Country, countryCodeLookup, drawMapD3) {
 
 	$scope.drawMap = drawMapD3;	
 }]);
+})(); 

@@ -28,6 +28,11 @@ module.exports = function(grunt) {
 				dest: 'app/js/<%= pkg.name %>.min.js'
 			}
 		},
+		jshint: {
+			build: {
+				src: ['Gruntfile.js', 'app/js/**/*.js', '!app/js/<%= pkg.name %>.js', '!app/js/<%= pkg.name %>.min.js']
+			}
+		},
 		sass: {
 			build: {
 				src: ['app/scss/*.scss'],
@@ -59,8 +64,9 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-sass');
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
+	grunt.loadNpmTasks('grunt-contrib-jshint');
 
-	grunt.registerTask('default', ['concat:build', 'sass:build']);
-	grunt.registerTask('prod', ['concat:build', 'uglify:build', 'sass:build'])
+	grunt.registerTask('default', ['concat:build', 'sass:build', 'jshint']);
+	grunt.registerTask('prod', ['concat:build', 'uglify:build', 'sass:build', 'jshint']);
 
 };

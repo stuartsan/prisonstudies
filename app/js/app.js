@@ -1,4 +1,7 @@
+(function () {
 'use strict';
+
+/* Application initialization */
 
 var pdApp = angular.module('prisonDataApp', 
 	['prisonDataControllers',
@@ -16,10 +19,11 @@ pdApp.config(['$routeProvider', '$locationProvider', function($routeProvider, $l
 		.when('/map', {
 			templateUrl: 'app/partials/map.html',
 			controller: 'MapCtrl'
-		})
+		});
 		// .otherwise({
 		// 	redirectTo: '/countries'
 		// });
 
 	// $locationProvider.html5Mode(true); //do enable this
 }]);
+})(); 

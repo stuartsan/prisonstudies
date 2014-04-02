@@ -1,3 +1,4 @@
+(function () { 
 'use strict';
 
 /* Filters */
@@ -5,7 +6,7 @@
 var pdFilters = angular.module('prisonDataFilters', []);
 
 function existy(x) {
-	return x != null;
+	return x !== null && x !== undefined;
 }
 
 function maybe(x, fn) {
@@ -27,24 +28,25 @@ function replace(x, y, z) {
 
 pdFilters.filter('fmtPercent', function () {
 	return function (x) {
-		return append(x, '%')
-	}
+		return append(x, '%');
+	};
 });
 
 pdFilters.filter('fmtInt', function () {
 	return function (x) {
-		return replace(x, /\B(?=(\d{3})+(?!\d))/g, ",")
-	}
+		return replace(x, /\B(?=(\d{3})+(?!\d))/g, ",");
+	};
 });
 
 pdFilters.filter('fmtPer100k', function () {
 	return function (x) {
 		return append(x, ' per 100k');
-	}
+	};
 });
 
 pdFilters.filter('naify', function () {
 	return function (x) {
 		return x || 'N/A';
-	}
+	};
 });
+})(); 

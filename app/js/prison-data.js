@@ -783,7 +783,10 @@ function(){this.$get=function(){return{}}});n.directive("ngView",x);n.directive(
   else this.topojson = topojson;
 }();
 
+(function () {
 'use strict';
+
+/* Application initialization */
 
 var pdApp = angular.module('prisonDataApp', 
 	['prisonDataControllers',
@@ -801,13 +804,15 @@ pdApp.config(['$routeProvider', '$locationProvider', function($routeProvider, $l
 		.when('/map', {
 			templateUrl: 'app/partials/map.html',
 			controller: 'MapCtrl'
-		})
+		});
 		// .otherwise({
 		// 	redirectTo: '/countries'
 		// });
 
 	// $locationProvider.html5Mode(true); //do enable this
 }]);
+})(); 
+(function () {		
 'use strict';
 
 /* Controllers */
@@ -818,12 +823,12 @@ pdControllers.controller('navCtrl', ['$scope', '$location', function($scope, $lo
 	$scope.paths = { countryList: 'countries', map: 'map' };
 	$scope.setClass = function(path) {
 		return $location.path().slice(1) === path ? 'active' : '';
-	}
+	};
 }]);
 
 pdControllers.controller('CountryListCtrl', ['$scope', 'Country', function($scope, Country){
-	$scope.order = 'total_prisoners'
-	$scope.descending = true
+	$scope.order = 'total_prisoners';
+	$scope.descending = true;
 	$scope.countries = Country.query();
 }]);
 
@@ -844,18 +849,10 @@ function($scope, Country, countryCodeLookup, drawMapD3) {
 
 	$scope.drawMap = drawMapD3;	
 }]);
-'use strict';
-
-/* Directives */
+})(); 
 
 
-// angular.module('myApp.directives', []).
-//   directive('appVersion', ['version', function(version) {
-//     return function(scope, elm, attrs) {
-//       elm.text(version);
-//     };
-//   }]);
-
+(function () { 
 'use strict';
 
 /* Filters */
@@ -863,7 +860,7 @@ function($scope, Country, countryCodeLookup, drawMapD3) {
 var pdFilters = angular.module('prisonDataFilters', []);
 
 function existy(x) {
-	return x != null;
+	return x !== null && x !== undefined;
 }
 
 function maybe(x, fn) {
@@ -885,27 +882,29 @@ function replace(x, y, z) {
 
 pdFilters.filter('fmtPercent', function () {
 	return function (x) {
-		return append(x, '%')
-	}
+		return append(x, '%');
+	};
 });
 
 pdFilters.filter('fmtInt', function () {
 	return function (x) {
-		return replace(x, /\B(?=(\d{3})+(?!\d))/g, ",")
-	}
+		return replace(x, /\B(?=(\d{3})+(?!\d))/g, ",");
+	};
 });
 
 pdFilters.filter('fmtPer100k', function () {
 	return function (x) {
 		return append(x, ' per 100k');
-	}
+	};
 });
 
 pdFilters.filter('naify', function () {
 	return function (x) {
 		return x || 'N/A';
-	}
+	};
 });
+})(); 
+(function() { 
 'use strict';
 
 /* Services */
@@ -946,7 +945,7 @@ pdServices.factory('drawMapD3', function() {
 
 		d3.json('app/theworld.json', function(err, world) {
 			
-			var countries = topojson.feature(world, world.objects.intermediate).features
+			var countries = topojson.feature(world, world.objects.intermediate).features;
 			var projection = d3.geo.mercator().scale(200);
 			var path = d3.geo.path().projection(projection);
 
@@ -955,13 +954,13 @@ pdServices.factory('drawMapD3', function() {
 		    .data(countries)
 		  .enter().append("path")
 		    .attr("fill", function(d) { 
-		    	var pData = hash[d.properties.adm0_a3]
+		    	var pData = hash[d.properties.adm0_a3];
 		    	if (!pData) return 'grey';
 		    	return colorScale(pData[dimension]);
 		    })
 		    .attr("d", path);
 		});
-	}
+	};
 });
 
 pdServices.value('countryCodeLookup', {
@@ -1192,3 +1191,4 @@ pdServices.value('countryCodeLookup', {
 	"Zambia": "ZMB",
 	"Zimbabwe": "ZWE"
 });
+})(); 
