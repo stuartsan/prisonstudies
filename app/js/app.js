@@ -1,5 +1,6 @@
 'use strict';
 
+console.log('hisi')
 
 var pdApp = angular.module('prisonDataApp', 
 	['prisonDataControllers',

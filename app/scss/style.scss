@@ -1,0 +1,22 @@
+#nav {
+	padding: 0;
+	list-style: none;
+	li {
+		display: inline-block;
+		padding-right: 1em;
+		background-color: #dddddd;
+		&.active {
+		background-color: #bbbbbb;
+		}
+	}
+}
+
+#map {
+	border: solid orange 2px;
+	.grey { fill: gray; }
+	.q0 { fill: #fef0d9; }
+	.q1 { fill: #fdcc8a; }
+	.q2 { fill: #fc8d59; }
+	.q3 { fill: #e34a33; }
+	.q4 { fill: #b30000; }
+}

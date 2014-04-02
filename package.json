@@ -10,7 +10,12 @@
     "http-server": "^0.6.1",
     "bower": "^1.3.1",
     "shelljs": "^0.2.6",
-    "grunt": "^0.4.4"
+    "grunt": "^0.4.4",
+    "grunt-sass": "^0.12.1",
+    "browserify": "^3.38.0",
+    "grunt-browserify": "^2.0.1",
+    "grunt-contrib-concat": "^0.4.0",
+    "grunt-contrib-watch": "^0.6.1"
   },
   "scripts": {
     "postinstall": "bower install",
