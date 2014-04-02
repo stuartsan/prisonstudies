@@ -10,11 +10,11 @@ var pdApp = angular.module('prisonDataApp',
 pdApp.config(['$routeProvider', '$locationProvider', function($routeProvider, $locationProvider) {
 	$routeProvider
 		.when('/countries', {
-			templateUrl: '/app/partials/countries.html',
+			templateUrl: 'app/partials/countries.html',
 			controller: 'CountryListCtrl'
 		})
 		.when('/map', {
-			templateUrl: '/app/partials/map.html',
+			templateUrl: 'app/partials/map.html',
 			controller: 'MapCtrl'
 		})
 		// .otherwise({
