@@ -1,3 +1,4 @@
+(function() { 
 'use strict';
 
 /* Services */
@@ -38,7 +39,7 @@ pdServices.factory('drawMapD3', function() {
 
 		d3.json('app/theworld.json', function(err, world) {
 			
-			var countries = topojson.feature(world, world.objects.intermediate).features
+			var countries = topojson.feature(world, world.objects.intermediate).features;
 			var projection = d3.geo.mercator().scale(200);
 			var path = d3.geo.path().projection(projection);
 
@@ -47,13 +48,13 @@ pdServices.factory('drawMapD3', function() {
 		    .data(countries)
 		  .enter().append("path")
 		    .attr("fill", function(d) { 
-		    	var pData = hash[d.properties.adm0_a3]
+		    	var pData = hash[d.properties.adm0_a3];
 		    	if (!pData) return 'grey';
 		    	return colorScale(pData[dimension]);
 		    })
 		    .attr("d", path);
 		});
-	}
+	};
 });
 
 pdServices.value('countryCodeLookup', {
@@ -284,3 +285,4 @@ pdServices.value('countryCodeLookup', {
 	"Zambia": "ZMB",
 	"Zimbabwe": "ZWE"
 });
+})(); 
