@@ -795,11 +795,11 @@ var pdApp = angular.module('prisonDataApp',
 pdApp.config(['$routeProvider', '$locationProvider', function($routeProvider, $locationProvider) {
 	$routeProvider
 		.when('/countries', {
-			templateUrl: '/app/partials/countries.html',
+			templateUrl: 'app/partials/countries.html',
 			controller: 'CountryListCtrl'
 		})
 		.when('/map', {
-			templateUrl: '/app/partials/map.html',
+			templateUrl: 'app/partials/map.html',
 			controller: 'MapCtrl'
 		})
 		// .otherwise({
@@ -944,7 +944,7 @@ pdServices.factory('drawMapD3', function() {
 			.attr('width', width)
 			.attr('height', height);
 
-		d3.json('/app/theworld.json', function(err, world) {
+		d3.json('app/theworld.json', function(err, world) {
 			
 			var countries = topojson.feature(world, world.objects.intermediate).features
 			var projection = d3.geo.mercator().scale(200);

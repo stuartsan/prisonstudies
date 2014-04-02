@@ -36,7 +36,7 @@ pdServices.factory('drawMapD3', function() {
 			.attr('width', width)
 			.attr('height', height);
 
-		d3.json('/app/theworld.json', function(err, world) {
+		d3.json('app/theworld.json', function(err, world) {
 			
 			var countries = topojson.feature(world, world.objects.intermediate).features
 			var projection = d3.geo.mercator().scale(200);
