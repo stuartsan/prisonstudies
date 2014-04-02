@@ -51,7 +51,7 @@ module.exports = function(grunt) {
 				tasks: 'sass:build'
 			},
 			js: {
-				files: ['app/js/**/*.js', '!app/js/build.js'],
+				files: ['app/js/**/*.js', '!app/js/prison-data.js', '!app/js/prison-data.min.js'],
 				tasks: ['concat:build']
 			},
 			html: {
