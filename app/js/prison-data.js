@@ -791,6 +791,7 @@ function(){this.$get=function(){return{}}});n.directive("ngView",x);n.directive(
 var pdApp = angular.module('prisonDataApp', 
 	['prisonDataControllers',
 	'prisonDataServices',
+	'prisonDataDirectives',
 	'prisonDataFilters',
 	'ngRoute']
 );
@@ -819,26 +820,36 @@ pdApp.config(['$routeProvider', '$locationProvider', function($routeProvider, $l
 
 var pdControllers = angular.module('prisonDataControllers', []);
 
-pdControllers.controller('navCtrl', ['$scope', '$location', function($scope, $location) {
+pdControllers.controller('navCtrl', ['$scope', '$location', 
+  function($scope, $location) {
 	$scope.paths = { countryList: 'countries', map: 'map' };
 	$scope.setClass = function(path) {
 		return $location.path().slice(1) === path ? 'active' : '';
 	};
 }]);
 
-pdControllers.controller('CountryListCtrl', ['$scope', 'Country', function($scope, Country){
-	$scope.order = 'total_prisoners';
-	$scope.descending = true;
+pdControllers.controller('CountryListCtrl', ['$scope', 'Country', 'validFilterSortDimensions', 
+  function($scope, Country, validFilterSortDimensions){
+  	$scope.display = {
+		dimension: 'total_prisoners',
+		dimensions: validFilterSortDimensions,
+		descending: true
+  	};
 	$scope.countries = Country.query();
+	$scope.orderFn = function(country) {
+		var x = country[$scope.display.dimension];
+   		return x === null || x === undefined ? 0 : x;
+	};
 }]);
 
-pdControllers.controller('MapCtrl', ['$scope', 'Country', 'countryCodeLookup', 'drawMapD3',
-function($scope, Country, countryCodeLookup, drawMapD3) {
+pdControllers.controller('MapCtrl', ['$scope', 'Country', 'countryCodeLookup', 'drawMapD3', 'validFilterSortDimensions',
+  function($scope, Country, countryCodeLookup, drawMapD3, validFilterSortDimensions) {
 
-	$scope.dimension = 'total_prisoners'; // Set default data dimension to visualize
+	$scope.dimensions = validFilterSortDimensions;
+	$scope.dimension = 'total_prisoners'; 
 	$scope.data = null;	                  // Array of country data, not yet merged with country codes
 	$scope.hash = null; 				  // Provides country data lookup by country code
-	
+		
 	$scope.data = Country.query(function(d) {
 		$scope.hash = d.reduce(function(acc, item) {
 			acc[countryCodeLookup[item.name]] = item;
@@ -846,11 +857,25 @@ function($scope, Country, countryCodeLookup, drawMapD3) {
 		}, {});
 		$scope.drawMap($scope.data, $scope.hash, $scope.dimension);
 	});
-
 	$scope.drawMap = drawMapD3;	
 }]);
 })(); 
+(function () {
+'use strict';
 
+var pdDirectives = angular.module('prisonDataDirectives', []);
+
+pdDirectives.directive('toolTipLink', function() {
+	return {
+		restrict: 'E',
+		scope: {
+			comment: '='
+		},
+		replace: true,
+		template: '<a class="comment-entry" title="{{comment | stripParens}}" ng-show="{{!!comment}}">?</a>'
+	};
+});
+})(); 
 
 (function () { 
 'use strict';
@@ -903,6 +928,13 @@ pdFilters.filter('naify', function () {
 		return x || 'N/A';
 	};
 });
+
+pdFilters.filter('stripParens', function () {
+	return function (x) {
+		return replace(x, /^\*?\((.*)\)$/, '$1');
+	};
+});
+
 })(); 
 (function() { 
 'use strict';
@@ -911,42 +943,41 @@ pdFilters.filter('naify', function () {
 
 var pdServices = angular.module('prisonDataServices', ['ngResource']);
 
-// Returns function with a query method that returns all country data
 pdServices.factory('Country', ['$resource',
   function($resource){
     return $resource('app/data.json', {}, {
       query: {method:'GET', isArray:true, cache:true}
     });
-  }]);
+ }]);
 
-pdServices.factory('drawMapD3', function() {
+pdServices.factory('World', ['$resource',
+  function($resource){
+    return $resource('app/theworld.json', {}, {
+      query: {method:'GET', cache:true}
+    });
+ }]);
+
+pdServices.value('validFilterSortDimensions', { 
+	total_prisoners: {label: 'Total prisoners', thresholds: [25000,70000,150000,700000, 2500000]},
+	prison_pop_rate: {label: 'Prison population rate', thresholds: [2,50,250,600,750]},
+	female_prisoners: {label: 'Female prisoners', thresholds: [1,3,6,9,14]},
+	juveniles: {label: 'Juvenile prisoners', thresholds: [1,2,3,10,18]},
+	foreign_prisoners: {label: 'Foreign prisoners', thresholds: [1, 3, 6, 40, 100]},
+	official_capacity: {label: 'Official capacity', thresholds: [25000,70000,150000,700000, 2500000]},
+	occupancy_level: {label: 'Occupancy level', thresholds: [40,75,100,200,450]},
+	total_establishments: {label: 'Total establishments', thresholds: [5,100,1000,2500,4600]},
+	pretrial_detainee_rate: {label: 'Pretrial detainees', thresholds: [3, 10, 25, 60, 90]}
+});
+
+pdServices.factory('drawMapD3', ['validFilterSortDimensions', 'World', 
+  function(dims, World) {
 	return function(data, hash, dimension) {
 
-		var min = d3.min(data, function(item) {
-			return item[dimension];
-		});
-		
-		var max = d3.max(data, function(item) {
-			return item[dimension];
-		});
-
-		var domain;
-
-		switch(dimension) {
-			case 'total_prisoners':
-				domain = [25000,50000,100000,500000, 1000000];
-				break;
-			case 'female_prisoners':
-				domain = [1,2,4,7,14];
-				break;
-			default:
-				domain = [min, max]
-		}
-
-		var colorScale = d3.scale.threshold().domain(domain)
-			.range(['q0', 'q1', 'q2', 'q3', 'q4']);
-
-		var width = 1000,
+		var min = d3.min(data, function(item) {return item[dimension];}),
+			max = d3.max(data, function(item) {return item[dimension];}),
+			domain = dims[dimension] && dims[dimension].thresholds || [min, max],
+			colorScale = d3.scale.threshold().domain(domain).range(['q0', 'q1', 'q2', 'q3', 'q4']),
+			width = 1100,
 	    	height = 500;
 
 	    d3.selectAll('svg').remove();
@@ -955,25 +986,26 @@ pdServices.factory('drawMapD3', function() {
 			.attr('width', width)
 			.attr('height', height);
 
-		d3.json('app/theworld.json', function(err, world) {
-			
-			var countries = topojson.feature(world, world.objects.intermediate).features;
-			var projection = d3.geo.mercator().scale(200);
-			var path = d3.geo.path().projection(projection);
+		World.query(function(world) {
 
+			var countries = topojson.feature(world, world.objects.intermediate).features,
+				projection = d3.geo.mercator().scale(150).translate([width / 2, height / 1.5]),
+				path = d3.geo.path().projection(projection);
 
-	      svg.selectAll(".country")
-		    .data(countries)
-		  .enter().append("path")
-		    .attr("class", function(d) { 
-		    	var pData = hash[d.properties.adm0_a3];
-		    	if (!pData) return 'grey';
-		    	return colorScale(pData[dimension]);
-		    })
-		    .attr("d", path);
+			svg.selectAll(".country")
+				.data(countries)
+			.enter().append("path")
+				.attr("class", function(d) { 
+					var pData = hash[d.properties.adm0_a3],
+						classes = ['country'];
+					if (!pData) classes.push('na'); 
+					else classes.push(colorScale(pData[dimension]));
+					return classes.join(' ');
+				})
+				.attr("d", path);
 		});
 	};
-});
+}]);
 
 
 pdServices.value('countryCodeLookup', {

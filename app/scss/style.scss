@@ -12,6 +12,7 @@ $map-color-2: #fdcc8a;
 $map-color-3: #fc8d59;
 $map-color-4: #e34a33;
 $map-color-5: #b30000;
+$map-not-available-color: gray;
 
 $link-color: black;
 
@@ -45,7 +46,7 @@ input, textarea {
 	outline: none;
 }
 
-ul {
+ul, li {
 	list-style: none;
 	padding: 0;
 	margin: 0;
@@ -58,8 +59,10 @@ ul {
 
 #site-title {
 	margin: .8em 0;
-	font-size: 2.5em;
-	color: darken($off-white, 25%);
+	font-size: 2.3em;
+	a {
+		color: darken($off-white, 25%);
+	}
 }
 
 #nav {
@@ -103,28 +106,70 @@ ul {
 	input[type="text"] {
 		width: 20em;
 	}
+	table {
+		width: 100%;
+	}
 	.country {
 		padding: .8em;
 		margin: 0 1% .7em 0;
 		background-color: darken($off-white, 10%);
 		float: left;
 		width: 30%;
-		height: 250px;
+		height: 300px;
 		&:nth-child(3n + 3) {
 			margin-right: 0;
 		}
 	}
+	.comment-entry {
+		margin-left: 2em;
+		font-weight: bold;
+		background: $off-white;
+		padding: 0em 0.3em;
+		border-radius: 1em;
+		float: right;
+		&:hover {
+			cursor: pointer;
+			background: darken($off-white, 4%);
+		}
+	}
+	// th + td {
+	// 	text-align: right;
+	// }
 }
 
 /*
  * D3 map
  */
 
+
 #map {
-	.grey { fill: gray; }
-	.q0 { fill: $map-color-1; }
-	.q1 { fill: $map-color-2; }
-	.q2 { fill: $map-color-3; }
-	.q3 { fill: $map-color-4; }
-	.q4 { fill: $map-color-5; }
+	.na { fill: gray; background-color: $map-not-available-color; }
+	.q0 { fill: $map-color-1; background-color: $map-color-1; }
+	.q1 { fill: $map-color-2; background-color: $map-color-2; }
+	.q2 { fill: $map-color-3; background-color: $map-color-3; }
+	.q3 { fill: $map-color-4; background-color: $map-color-4; }
+	.q4 { fill: $map-color-5; background-color: $map-color-5; }
+	.country {
+		&:hover {
+			fill-opacity: .7;
+			transition: fill-opacity .2s linear;
+			cursor: pointer;
+		}
+	}
+	.legend {
+		.thresholds {
+			padding: 0 0 1em 0;
+		}
+		.threshold {
+			display: inline-block;
+			margin-right: 1.3em;
+		}
+		.box {
+			display: inline-block;
+			height: 1em;
+			width: 1em;
+			border: solid 1px $dark-grey;
+		}
+	}
 }
+

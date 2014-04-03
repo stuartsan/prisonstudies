@@ -1,16 +1,22 @@
 <div id="map">
 	<div class="controls">
 		<span>Compare countries by:</span>
-		<select type="text" ng-model="dimension" ng-change="drawMap(data, hash, dimension)">
-			<option value="total_prisoners">Total prisoners</option>
-			<option value="female_prisoners">% Female prisoners</option>
-			<option value="juveniles">$ Young'n prisoners</option>
-			<option value="official_capacity">Official capacity</option>
-			<option value="occupancy_level">% Occupancy level</option>
-			<option value="total_establishments">Total establishments</option>
-			<option value="foreign_prisoners">$ Foreign prisoners</option>
-			<option value="pretrial_detainee_rate">% Pretrial detainees</option>
-			<option value="prison_pop_rate">% Of people in country imprisoned</option>
+		<select type="text" 
+				ng-model="dimension" 
+				ng-change="drawMap(data, hash, dimension)" 
+				ng-options="k as v.label for (k, v) in dimensions">
 		</select>
+	</div>
+	<div class="legend">
+		<li class="thresholds" ng-show="k==dimension" ng-repeat="(k,v) in dimensions">
+			<div class="threshold" ng-repeat="num in v.thresholds">
+				<span class="num">&lt; {{num | fmtInt}}</span>
+				<span class="{{'q'+$index + ' box'}}"></span>
+			</div>
+			<div class="threshold">
+				<span class="num">Not available</span>
+				<span class="na box"></span>
+			</div>
+		</li>
 	</div>
 </div>
