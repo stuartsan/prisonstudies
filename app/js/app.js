@@ -6,6 +6,7 @@
 var pdApp = angular.module('prisonDataApp', 
 	['prisonDataControllers',
 	'prisonDataServices',
+	'prisonDataDirectives',
 	'prisonDataFilters',
 	'ngRoute']
 );

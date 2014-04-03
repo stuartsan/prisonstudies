@@ -24,7 +24,7 @@ a:link, a:visited {
 input, textarea {
   outline: none; }
 
-ul {
+ul, li {
   list-style: none;
   padding: 0;
   margin: 0; }
@@ -35,8 +35,9 @@ ul {
 
 #site-title {
   margin: 0.8em 0;
-  font-size: 2.5em;
-  color: #a5a5a5; }
+  font-size: 2.3em; }
+  #site-title a {
+    color: #a5a5a5; }
 
 #nav {
   padding: 0;
@@ -71,28 +72,60 @@ ul {
   overflow: hidden; }
   #countries input[type="text"] {
     width: 20em; }
+  #countries table {
+    width: 100%; }
   #countries .country {
     padding: 0.8em;
     margin: 0 1% 0.7em 0;
     background-color: #cccccc;
     float: left;
     width: 30%;
-    height: 250px; }
+    height: 300px; }
     #countries .country:nth-child(3n+3) {
       margin-right: 0; }
+  #countries .comment-entry {
+    margin-left: 2em;
+    font-weight: bold;
+    background: #e5e5e5;
+    padding: 0em 0.3em;
+    border-radius: 1em;
+    float: right; }
+    #countries .comment-entry:hover {
+      cursor: pointer;
+      background: #dbdbdb; }
 
 /*
  * D3 map
  */
-#map .grey {
-  fill: gray; }
+#map .na {
+  fill: gray;
+  background-color: grey; }
 #map .q0 {
-  fill: #fef0d9; }
+  fill: #fef0d9;
+  background-color: #fef0d9; }
 #map .q1 {
-  fill: #fdcc8a; }
+  fill: #fdcc8a;
+  background-color: #fdcc8a; }
 #map .q2 {
-  fill: #fc8d59; }
+  fill: #fc8d59;
+  background-color: #fc8d59; }
 #map .q3 {
-  fill: #e34a33; }
+  fill: #e34a33;
+  background-color: #e34a33; }
 #map .q4 {
-  fill: #b30000; }
+  fill: #b30000;
+  background-color: #b30000; }
+#map .country:hover {
+  fill-opacity: 0.7;
+  transition: fill-opacity 0.2s linear;
+  cursor: pointer; }
+#map .legend .thresholds {
+  padding: 0 0 1em 0; }
+#map .legend .threshold {
+  display: inline-block;
+  margin-right: 1.3em; }
+#map .legend .box {
+  display: inline-block;
+  height: 1em;
+  width: 1em;
+  border: solid 1px #3f3f3f; }

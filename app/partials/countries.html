@@ -2,25 +2,78 @@
   <div class="controls">
     <input type="text" ng-model="textBox" placeholder="Start typing a country name..." autofocus/>
     <span>Sort by:</span>
-    <select ng-model="order">
-      <option value="total_prisoners">Total prisoners</option>
-      <option value="female_prisoners">Female prisoners</option>
+    <select ng-model="display.dimension"
+            ng-options="k as v.label for (k, v) in display.dimensions">
     </select>
     <span>From:</span>
-    <select ng-model="descending">
+    <select ng-model="display.descending">
       <option value="true">Highest</option>
       <option value="false">Lowest</option>
     </select>
   </div>
   <ul>
-    <li class="country" ng-repeat="country in filtered = (countries | filter:{name: textBox} | orderBy:order:descending)">
+    <li class="country" 
+        ng-repeat="country in filtered = 
+        (countries | filter:{name: textBox} | orderBy:orderFn:display.descending)">
       <h2>{{ country.name }}</h2>
       <table>
-        <tr><th>Total prisoners:</th><td>{{ country.total_prisoners | fmtInt | naify }}</td></tr>
-        <tr><th>Prison population rate:</th><td>{{ country.prison_pop_rate | fmtInt | fmtPer100k | naify }}</td></tr>
-        <tr><th>Female prisoners:</th><td>{{ country.female_prisoners | fmtPercent | naify }}</td></tr>
-        <tr><th>Occupancy level:</th><td>{{ country.occupancy_level | fmtPercent | naify }}</td></tr>
-        <tr><td><a ng-href="{{country.pso_url}}" target="_blank">Learn more</a></td></tr>
+        <tr>
+          <th>Total prisoners:</th>
+          <td>{{ country.total_prisoners | fmtInt | naify }}
+            <tool-tip-link comment="country.total_prisoners_comment"></tool-tip-link>
+          </td>
+        </tr>
+        <tr>
+          <th>Prison population rate:</th>
+          <td>{{ country.prison_pop_rate | fmtInt | fmtPer100k | naify }}
+            <tool-tip-link comment="country.prison_pop_rate_comment"></tool-tip-link>
+          </td>
+        </tr>
+        <tr>
+          <th>Female prisoners:</th>
+          <td>{{ country.female_prisoners | fmtPercent | naify }}
+            <tool-tip-link comment="country.female_prisoners_comment"></tool-tip-link>
+        </td>
+        </tr>
+        <tr>
+          <th>Juvenile prisoners:</th>
+          <td>{{ country.juveniles | fmtPercent | naify }}
+            <tool-tip-link comment="country.juveniles"></tool-tip-link>
+        </td>
+        </tr>
+        <tr>
+          <th>Official capacity:</th>
+          <td>{{ country.official_capacity | fmtInt | naify }}
+            <tool-tip-link comment="country.official_capacity_comment"></tool-tip-link>
+          </td>
+        </tr>
+        <tr>
+          <th>Occupancy level:</th>
+          <td>{{ country.occupancy_level | fmtPercent | naify }}
+            <tool-tip-link comment="country.occupancy_level_comment"></tool-tip-link>
+          </td>
+        </tr>
+        <tr>
+          <th>Pretrial detainee rate:</th>
+          <td>{{ country.pretrial_detainee_rate | fmtPercent | naify }}
+            <tool-tip-link comment="country.pretrial_detainee_rate_comment"></tool-tip-link>
+          </td>
+        </tr>
+        <tr>
+          <th>Foreign prisoners:</th>
+          <td>{{ country.foreign_prisoners | fmtPercent | naify }}
+            <tool-tip-link comment="country.foreign_prisoners_comment"></tool-tip-link>
+          </td>
+        </tr>
+        <tr>
+          <th>Total establishments:</th>
+          <td>{{ country.total_establishments | fmtInt | naify }}
+            <tool-tip-link comment="country.total_establishments_comment"></tool-tip-link>
+          </td>
+        </tr>
+        <tr>
+          <td><a ng-href="{{country.pso_url}}" target="_blank">Learn more</a></td>
+        </tr>
       </table>
     </li>
     <li ng-hide="filtered.length">No matching countries.</li>

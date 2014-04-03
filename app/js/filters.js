@@ -49,4 +49,11 @@ pdFilters.filter('naify', function () {
 		return x || 'N/A';
 	};
 });
+
+pdFilters.filter('stripParens', function () {
+	return function (x) {
+		return replace(x, /^\*?\((.*)\)$/, '$1');
+	};
+});
+
 })(); 

@@ -5,26 +5,36 @@
 
 var pdControllers = angular.module('prisonDataControllers', []);
 
-pdControllers.controller('navCtrl', ['$scope', '$location', function($scope, $location) {
+pdControllers.controller('navCtrl', ['$scope', '$location', 
+  function($scope, $location) {
 	$scope.paths = { countryList: 'countries', map: 'map' };
 	$scope.setClass = function(path) {
 		return $location.path().slice(1) === path ? 'active' : '';
 	};
 }]);
 
-pdControllers.controller('CountryListCtrl', ['$scope', 'Country', function($scope, Country){
-	$scope.order = 'total_prisoners';
-	$scope.descending = true;
+pdControllers.controller('CountryListCtrl', ['$scope', 'Country', 'validFilterSortDimensions', 
+  function($scope, Country, validFilterSortDimensions){
+  	$scope.display = {
+		dimension: 'total_prisoners',
+		dimensions: validFilterSortDimensions,
+		descending: true
+  	};
 	$scope.countries = Country.query();
+	$scope.orderFn = function(country) {
+		var x = country[$scope.display.dimension];
+   		return x === null || x === undefined ? 0 : x;
+	};
 }]);
 
-pdControllers.controller('MapCtrl', ['$scope', 'Country', 'countryCodeLookup', 'drawMapD3',
-function($scope, Country, countryCodeLookup, drawMapD3) {
+pdControllers.controller('MapCtrl', ['$scope', 'Country', 'countryCodeLookup', 'drawMapD3', 'validFilterSortDimensions',
+  function($scope, Country, countryCodeLookup, drawMapD3, validFilterSortDimensions) {
 
-	$scope.dimension = 'total_prisoners'; // Set default data dimension to visualize
+	$scope.dimensions = validFilterSortDimensions;
+	$scope.dimension = 'total_prisoners'; 
 	$scope.data = null;	                  // Array of country data, not yet merged with country codes
 	$scope.hash = null; 				  // Provides country data lookup by country code
-	
+		
 	$scope.data = Country.query(function(d) {
 		$scope.hash = d.reduce(function(acc, item) {
 			acc[countryCodeLookup[item.name]] = item;
@@ -32,7 +42,6 @@ function($scope, Country, countryCodeLookup, drawMapD3) {
 		}, {});
 		$scope.drawMap($scope.data, $scope.hash, $scope.dimension);
 	});
-
 	$scope.drawMap = drawMapD3;	
 }]);
 })(); 
