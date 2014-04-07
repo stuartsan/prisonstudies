@@ -27,8 +27,8 @@ pdControllers.controller('CountryListCtrl', ['$scope', 'Country', 'validFilterSo
 	};
 }]);
 
-pdControllers.controller('MapCtrl', ['$scope', 'Country', 'countryCodeLookup', 'drawMapD3', 'validFilterSortDimensions',
-  function($scope, Country, countryCodeLookup, drawMapD3, validFilterSortDimensions) {
+pdControllers.controller('MapCtrl', ['$scope', 'Country', 'drawMapD3', 'validFilterSortDimensions',
+  function($scope, Country, drawMapD3, validFilterSortDimensions) {
 
 	$scope.dimensions = validFilterSortDimensions;
 	$scope.dimension = 'total_prisoners'; 
@@ -37,7 +37,8 @@ pdControllers.controller('MapCtrl', ['$scope', 'Country', 'countryCodeLookup', '
 		
 	$scope.data = Country.query(function(d) {
 		$scope.hash = d.reduce(function(acc, item) {
-			acc[countryCodeLookup[item.name]] = item;
+			acc[item.country_code] = item;
+			delete acc[item.country_code].country_code;
 			return acc;
 		}, {});
 		$scope.drawMap($scope.data, $scope.hash, $scope.dimension);
