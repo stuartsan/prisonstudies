@@ -30,42 +30,4 @@ pdServices.value('validFilterSortDimensions', {
 	total_establishments: {label: 'Total establishments', thresholds: [5,100,1000,2500,4600]},
 	pretrial_detainee_rate: {label: 'Pretrial detainees', thresholds: [3, 10, 25, 60, 90]}
 });
-
-pdServices.factory('drawMapD3', ['validFilterSortDimensions', 'World', 
-  function(dims, World) {
-	return function(data, hash, dimension) {
-
-		var min = d3.min(data, function(item) {return item[dimension];}),
-			max = d3.max(data, function(item) {return item[dimension];}),
-			domain = dims[dimension] && dims[dimension].thresholds || [min, max],
-			colorScale = d3.scale.threshold().domain(domain).range(['q0', 'q1', 'q2', 'q3', 'q4']),
-			width = 1100,
-	    	height = 500;
-
-	    d3.selectAll('svg').remove();
-
-		var svg = d3.select('#map').append('svg')
-			.attr('width', width)
-			.attr('height', height);
-
-		World.query(function(world) {
-
-			var countries = topojson.feature(world, world.objects.intermediate).features,
-				projection = d3.geo.mercator().scale(150).translate([width / 2, height / 1.5]),
-				path = d3.geo.path().projection(projection);
-
-			svg.selectAll(".country")
-				.data(countries)
-			.enter().append("path")
-				.attr("class", function(d) { 
-					var pData = hash[d.properties.adm0_a3],
-						classes = ['country'];
-					if (!pData) classes.push('na'); 
-					else classes.push(colorScale(pData[dimension]));
-					return classes.join(' ');
-				})
-				.attr("d", path);
-		});
-	};
-}]);
 })(); 
