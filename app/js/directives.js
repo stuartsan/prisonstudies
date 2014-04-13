@@ -1,7 +1,7 @@
 (function () {
 'use strict';
 
-var pdDirectives = angular.module('prisonDataDirectives', []);
+var pdDirectives = angular.module('prisonDataDirectives', ['ui.select2']);
 
 pdDirectives.directive('toolTipLink', function() {
 	return {
@@ -45,7 +45,7 @@ function($compile, dims, World) {
 			function lookupGenerator(obj) {
 				return function(prop) {
 					return obj[prop];
-				}
+				};
 			}
 			var countryLookup = lookupGenerator(hash);
 
@@ -57,7 +57,7 @@ function($compile, dims, World) {
 					return props.reduce(function(acc, item) {
 						return acc[item];
 					}, obj);
-				}	
+				};	
 			}	
 
 			function assignClass(dimension, colorScale, countryCode) {
@@ -75,7 +75,7 @@ function($compile, dims, World) {
 					colorScale = d3.scale.threshold().domain(domain).range(['q0', 'q1', 'q2', 'q3', 'q4']),
 					assignCountryClass = function(obj) {
 						return assignClass.call(null, dimension, colorScale, getProp('properties.adm0_a3')(obj));
-					}
+					};
 
 				if (!ready) return; 
 

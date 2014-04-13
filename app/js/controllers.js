@@ -5,9 +5,9 @@
 
 var pdControllers = angular.module('prisonDataControllers', []);
 
-pdControllers.controller('navCtrl', ['$scope', '$location', 
-function($scope, $location) {
-	$scope.paths = { countryList: 'countries', map: 'map' };
+pdControllers.controller('navCtrl', ['$scope', '$location', 'paths', 
+function($scope, $location, paths) {
+	$scope.paths = paths.paths;
 	$scope.setClass = function(path) {
 		return $location.path().slice(1) === path ? 'active' : '';
 	};
@@ -38,5 +38,19 @@ function($scope, Country, validFilterSortDimensions) {
 	$scope.hash = Country.queryHash(function() {
 		$scope.ready = true;
 	});
+}]);
+
+pdControllers.controller('CompareCtrl', ['$scope', 'Country',
+function($scope, Country) {
+	$scope.selected = null;
+  	$scope.countries = Country.query();
+  	$scope.goDoStuff = function() {
+  		//Nothing yet!
+  	};
+}]);
+
+pdControllers.controller('AboutCtrl', ['$scope',
+function($scope, Country) {
+	//Nothing yet!!!
 }]);
 })(); 

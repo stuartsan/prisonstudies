@@ -20,10 +20,18 @@ pdApp.config(['$routeProvider', '$locationProvider', function($routeProvider, $l
 		.when('/map', {
 			templateUrl: 'app/partials/map.html',
 			controller: 'MapCtrl'
+		})
+		.when('/compare', {
+			templateUrl: 'app/partials/compare.html',
+			controller: 'CompareCtrl'
+		})
+		.when('/about', {
+			templateUrl: 'app/partials/about.html',
+			controller: 'AboutCtrl'
+		})
+		.otherwise({
+			redirectTo: '/countries'
 		});
-		// .otherwise({
-		// 	redirectTo: '/countries'
-		// });
 
 	// $locationProvider.html5Mode(true); //do enable this
 }]);

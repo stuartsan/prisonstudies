@@ -39,9 +39,28 @@ function($resource){
 pdServices.factory('World', ['$resource',
 function($resource){
     return $resource('app/theworld.json', {}, {
-      query: {method:'GET', cache:true}
+      query: {method: 'GET', cache: true}
     });
  }]);
+
+/**
+ * Paths to feed navigation menus. Allows paths to be added at runtime. Why not!?
+ */
+ pdServices.factory('paths', function() {
+ 	var paths = [
+		{path: 'countries', label: 'List Countries'}, 
+		{path: 'map', label: 'Map'}, 
+		{path: 'compare', label: 'Compare'},
+		{path: 'about', label: 'About'}
+	];
+ 	return {
+ 		paths: paths,
+ 		addPath: function(path) {
+ 			paths.push(path);
+ 			return path;
+ 		}
+ 	};
+ }); 
 
 /**
  * Provides allowed data dimensions to sort, filter, etc., countries.
