@@ -2,13 +2,13 @@
 	<div class="controls">
 		<span>Compare countries by:</span>
 		<select type="text" 
-				ng-model="dimension" 
-				ng-options="k as v.label for (k, v) in dimensions">
+				ng-model="display.dimension" 
+				ng-options="k as v.label for (k, v) in display.dimensions">
 		</select>
-		<span>{{hash[currentCountry].name}}: {{hash[currentCountry][dimension]}}</span>
+		<span>{{hash[currentCountry].name}}: {{hash[currentCountry][display.dimension]}}</span>
 	</div>
 	<div class="legend">
-		<li class="thresholds" ng-show="k==dimension" ng-repeat="(k,v) in dimensions">
+		<li class="thresholds" ng-show="k==display.dimension" ng-repeat="(k,v) in display.dimensions">
 			<div class="threshold" ng-repeat="num in v.thresholds">
 				<span class="num">&lt; {{num | fmtInt}}</span>
 				<span class="{{'q'+$index + ' box'}}"></span>
@@ -19,5 +19,8 @@
 			</div>
 		</li>
 	</div>
-	<choropleth></choropleth>
+	<choropleth dimension="display.dimension"
+			    ready="ready"
+				hash="hash">
+	</choropleth>
 </div>

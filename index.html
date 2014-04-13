@@ -3,13 +3,13 @@
 <head>
   <title>Worldwide Incarceration Data</title>
   <link rel="stylesheet" type="text/css" href="app/css/style.css">
+  <link rel="stylesheet" type="text/css" href="bower_components/select2/select2.css">
 </head>
 <body>
   <div id="page">
     <h1 id="site-title"><a ng-href="#">Prison Data</a></h1>
     <ul id="nav" ng-controller="navCtrl">
-      <li ng-class="setClass(paths.countryList)"><a ng-href="#{{paths.countryList}}">Country List</a></li>
-      <li ng-class="setClass(paths.map)"><a ng-href="#{{paths.map}}">Map</a></li>
+      <li ng-repeat="path in paths" ng-class="setClass(path.path)"><a ng-href="#{{path.path}}">{{path.label}}</a></li>
     </ul>
     <div id="main" ng-view></div>
   </div>

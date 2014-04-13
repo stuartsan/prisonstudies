@@ -5,9 +5,12 @@ module.exports = function(grunt) {
 		concat: {
 			build: {
 				src: [
+					'bower_components/jquery/dist/jquery.min.js',
+					'bower_components/select2/select2.js',
 					'bower_components/angular/angular.min.js',
 					'bower_components/angular-resource/angular-resource.min.js',
 					'bower_components/angular-route/angular-route.min.js',
+					'bower_components/angular-ui-select2/src/select2.js',
 					'bower_components/d3/d3.min.js',
 					'bower_components/topojson/topojson.js',
 					'app/js/app.js',
