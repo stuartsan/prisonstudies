@@ -821,7 +821,7 @@ pdApp.config(['$routeProvider', '$locationProvider', function($routeProvider, $l
 var pdControllers = angular.module('prisonDataControllers', []);
 
 pdControllers.controller('navCtrl', ['$scope', '$location', 
-  function($scope, $location) {
+function($scope, $location) {
 	$scope.paths = { countryList: 'countries', map: 'map' };
 	$scope.setClass = function(path) {
 		return $location.path().slice(1) === path ? 'active' : '';
@@ -829,7 +829,7 @@ pdControllers.controller('navCtrl', ['$scope', '$location',
 }]);
 
 pdControllers.controller('CountryListCtrl', ['$scope', 'Country', 'validFilterSortDimensions', 
-  function($scope, Country, validFilterSortDimensions){
+function($scope, Country, validFilterSortDimensions){
   	$scope.display = {
 		dimension: 'total_prisoners',
 		dimensions: validFilterSortDimensions,
@@ -843,22 +843,14 @@ pdControllers.controller('CountryListCtrl', ['$scope', 'Country', 'validFilterSo
 }]);
 
 pdControllers.controller('MapCtrl', ['$scope', 'Country', 'validFilterSortDimensions',
-  function($scope, Country, validFilterSortDimensions) {
-
-	$scope.dimensions = validFilterSortDimensions;
-	$scope.dimension = 'total_prisoners'; 
-	$scope.data = null;	                  // Array of country data, not yet merged with country codes
-	$scope.hash = null; 				  // Provides country data lookup by country code
+function($scope, Country, validFilterSortDimensions) {
+  	$scope.display = {
+		dimensions: validFilterSortDimensions,
+		dimension: 'total_prisoners',
+		currentCountry: null
+  	};
 	$scope.ready = false;
-
-	$scope.currentCountry = null;
-		
-	$scope.data = Country.query(function(d) {
-		$scope.hash = d.reduce(function(acc, item) {
-			acc[item.country_code] = item;
-			delete acc[item.country_code].country_code;
-			return acc;
-		}, {});
+	$scope.hash = Country.queryHash(function() {
 		$scope.ready = true;
 	});
 }]);
@@ -879,18 +871,97 @@ pdDirectives.directive('toolTipLink', function() {
 	};
 });
 
+/**
+ * Choropleth directive allows us to drop a choropleth map into the dom, when the data it needs is ready.
+ */
 pdDirectives.directive('choropleth', ['$compile','validFilterSortDimensions', 'World', 
-  function($compile, dims, World) {
+function($compile, dims, World) {
   	return {
   		restrict: 'E',
   		replace: true,
+  		scope: {
+  			dimension: '=',
+  			ready: '=',
+  			hash: '='
+  		},
   		link: function(scope, element, attrs) {
 
-	    	function addMap(w, h) {
-			    d3.select(element[0]).selectAll('svg').remove();
-				return d3.select(element[0]).append('svg').attr('width', w).attr('height', h);
-	    	}
-	    	
+  			// One-time D3 setup
+  			var width = 1100,
+  				height = 500,
+				projection = d3.geo.mercator().scale(150).translate([width / 2, height / 1.5]),
+				path = d3.geo.path().projection(projection);
+  				
+  			// References
+			var hash = scope.hash,
+				data = d3.values(hash),
+				countries,  // Country data
+				svg;        // Reference to SVG element			
+			
+			// Helper functions to set this party started
+			function lookupGenerator(obj) {
+				return function(prop) {
+					return obj[prop];
+				}
+			}
+			var countryLookup = lookupGenerator(hash);
+
+			// Returns a function that takes an object and looks up arbitrarily
+			// nested properties using dot notation, provided by propStr
+			function getProp(propStr) {
+				var props = propStr.split('.');
+				return function(obj) {
+					return props.reduce(function(acc, item) {
+						return acc[item];
+					}, obj);
+				}	
+			}	
+
+			function assignClass(dimension, colorScale, countryCode) {
+				var data = countryLookup(countryCode);
+				return ['country', (data && colorScale(data[dimension])) || 'na'].join(' ');
+			}
+
+			// Keep an eye on readiness and the selected dimension. When these change, draw map or update CSS classes.
+			scope.$watchCollection('[ready, dimension]', function(newVals, oldVals, scope) {
+
+				// D3 dynamic vars
+				var ready = newVals[0],
+					dimension = newVals[1],
+					domain = dims[dimension].thresholds,
+					colorScale = d3.scale.threshold().domain(domain).range(['q0', 'q1', 'q2', 'q3', 'q4']),
+					assignCountryClass = function(obj) {
+						return assignClass.call(null, dimension, colorScale, getProp('properties.adm0_a3')(obj));
+					}
+
+				if (!ready) return; 
+
+				if (!svg) {
+					// Add svg to element, assign to a reference that persists between calls to this fn
+					svg = d3.select(element[0]).append('svg')
+						.attr('width', width)
+						.attr('height', height);
+
+					// Get geoJSON data and draw map
+					World.query(function(world) {
+						var countries = topojson.feature(world, world.objects.intermediate).features;
+						svg.selectAll('.country')
+							.data(countries)
+							.enter().append('path')
+								.attr('class', assignCountryClass)
+								.attr('cc', getProp('properties.adm0_a3'))
+								.attr('d', path);
+					});
+				} 
+				else {
+					// Just update the CSS classes instead of redrawing the map
+					svg.selectAll('.country')
+						.attr('class', assignCountryClass);
+				}
+
+			});
+
+  			// Display a bit of data about hovered-over country in the template
 	    	element.bind('mouseover', function(e) {
 	    		if (e.target.attributes && e.target.attributes.cc) {
 	    			scope.$apply(function() {
@@ -898,50 +969,6 @@ pdDirectives.directive('choropleth', ['$compile','validFilterSortDimensions', 'W
 	    			});
 	    		}
 	    	});
-
-			scope.$watchCollection('[ready, dimension]', function(newVals, oldVals, scope) {
-
-				// Grab some references
-				var hash = scope.hash,
-  					dimension = scope.dimension,
-  					data = scope.data,
-					ready = newVals[0];
-
-				// d3 choropleth setup
-				var width = 1100,
-					height = 500,
-				 	min = d3.min(data, function(item) {return item[dimension];}),
-					max = d3.max(data, function(item) {return item[dimension];}),
-					domain = dims[dimension] && dims[dimension].thresholds || [min, max],
-					colorScale = d3.scale.threshold().domain(domain).range(['q0', 'q1', 'q2', 'q3', 'q4']),
-					projection = d3.geo.mercator().scale(150).translate([width / 2, height / 1.5]),
-					path = d3.geo.path().projection(projection);
-				
-				if (!ready) return; 
-
-				var svg = addMap(width, height);
-
-				World.query(function(world) {
-
-					var countries = topojson.feature(world, world.objects.intermediate).features;
-
-					svg.selectAll('.country')
-						.data(countries)
-					.enter().append('path')
-						.attr('class', function(d) { 
-							var pData = hash[d.properties.adm0_a3],
-								classes = ['country'];
-							if (!pData) classes.push('na'); 
-							else classes.push(colorScale(pData[dimension]));
-							return classes.join(' ');
-						})
-						.attr('cc', function(d) {
-							return d.properties.adm0_a3;
-						})
-						.attr('d', path);
-				});
-				
-			});
   		}
   	};
 }]);
@@ -1012,20 +1039,47 @@ pdFilters.filter('stripParens', function () {
 
 var pdServices = angular.module('prisonDataServices', ['ngResource']);
 
+/**
+ * Country service returns a resource object with a customized GET method
+ * that transforms the JSON data (an array of objects) into an object where
+ * key = country code and value = country data. Angular is smart enough to make
+ * just one request for both methods, caching the result.
+ */
 pdServices.factory('Country', ['$resource',
-  function($resource){
-    return $resource('app/data.json', {}, {
-      query: {method:'GET', isArray:true, cache:true}
+function($resource){
+    return $resource('app/data.json', {/* default params */}, {
+      	query: {
+      		method: 'GET',
+      		cache: true,
+      		isArray: true
+      	},
+    	queryHash: {
+    		method: 'GET', 
+      		cache: true,
+      		transformResponse: function(data) {
+      			return JSON.parse(data).reduce(function(acc, item) {
+					acc[item.country_code] = item;
+					delete acc[item.country_code].country_code;
+					return acc;
+				}, {});
+      		}
+      	}
     });
  }]);
 
+/**
+ * Just grabs a JSON file. Returns resource object.
+ */
 pdServices.factory('World', ['$resource',
-  function($resource){
+function($resource){
     return $resource('app/theworld.json', {}, {
       query: {method:'GET', cache:true}
     });
  }]);
 
+/**
+ * Provides allowed data dimensions to sort, filter, etc., countries.
+ */
 pdServices.value('validFilterSortDimensions', { 
 	total_prisoners: {label: 'Total prisoners', thresholds: [25000,70000,150000,700000, 2500000]},
 	prison_pop_rate: {label: 'Prison population rate', thresholds: [2,50,250,600,750]},
