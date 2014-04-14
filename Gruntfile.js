@@ -3,7 +3,7 @@ module.exports = function(grunt) {
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
 		concat: {
-			build: {
+			js: {
 				src: [
 					'bower_components/jquery/dist/jquery.min.js',
 					'bower_components/select2/select2.js',
@@ -21,14 +21,23 @@ module.exports = function(grunt) {
 				],
 				dest: 'app/js/<%= pkg.name %>.js'
 			},
+			css: {
+				src: ['bower_components/select2/select2.css', 'app/css/style.css'],
+				dest: 'app/css/<%= pkg.name %>.css'
+			}
 		},
 		uglify: {
 			options: {
         		banner: '/*! <%= pkg.name %> <%= grunt.template.today("dd-mm-yyyy") %> */\n'
       		},
-			build: {
-				src: '<%= concat.build.dest  %>',
+			js: {
+				src: '<%= concat.js.dest  %>',
 				dest: 'app/js/<%= pkg.name %>.min.js'
+			},
+			css: {
+				src: '<%= concat.css.dest  %>',
+				dest: 'app/css/<%= pkg.name %>.min.css'
+
 			}
 		},
 		jshint: {
@@ -69,7 +78,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 
-	grunt.registerTask('default', ['concat:build', 'sass:build', 'jshint']);
-	grunt.registerTask('prod', ['concat:build', 'uglify:build', 'sass:build', 'jshint']);
+	grunt.registerTask('default', ['sass', 'jshint', 'concat']);
+	grunt.registerTask('prod', ['sass', 'jshint', 'uglify', 'concat', 'jshint']);
 
 };
