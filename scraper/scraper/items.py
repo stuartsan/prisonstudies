@@ -22,4 +22,4 @@ class Country(Item):
   occupancy_level_comment          = Field()
   pso_url                          = Field()
   country_code                     = Field()
-
+  trend                            = Field()
