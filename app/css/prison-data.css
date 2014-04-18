@@ -34,10 +34,11 @@ ul, li {
   padding: 1em; }
 
 #site-title {
-  margin: 0.8em 0;
-  font-size: 2.3em; }
+  margin: 0.8em 0.3em;
+  font-size: 1.8em; }
   #site-title a {
-    color: #a5a5a5; }
+    color: #a5a5a5;
+    font-weight: normal; }
 
 #nav {
   padding: 0;
@@ -86,7 +87,8 @@ ul, li {
   background-color: #cccccc;
   float: left;
   width: 30%;
-  height: 300px; }
+  height: 320px;
+  position: relative; }
   #countries .country:nth-child(3n+3) {
     margin-right: 0; }
 #countries .comment-entry {
@@ -158,6 +160,17 @@ ul, li {
   background-color: #cccccc;
   float: left;
   width: 30%;
-  height: 300px; }
+  height: 320px;
+  position: relative; }
   #compare bar-chart:nth-child(3n+3) {
     margin-right: 0; }
+#compare .label {
+  background-color: black;
+  color: #d6d6d6;
+  padding: 5px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  margin: 0;
+  font-size: 1.3em; }

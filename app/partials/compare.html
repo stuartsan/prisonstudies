@@ -8,8 +8,9 @@
 	<bar-chart 
 		ng-repeat="(dimensionKey, dimensionVals) in display.dimensions"
 		dimension="dimensionKey"
+		label="dimensionVals.label"
 		ready="hash.$resolved"
-		countries="countries"
+		selected="selected"
 		hash="hash">
 	</bar-chart>
 </div>
