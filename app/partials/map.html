@@ -5,7 +5,7 @@
 				ng-model="display.dimension" 
 				ng-options="k as v.label for (k, v) in display.dimensions">
 		</select>
-		<span>{{hash[currentCountry].name}}: {{hash[currentCountry][display.dimension]}}</span>
+		<span ng-show="{{currentCountry !== null}}"> {{hash[currentCountry].name}}: {{hash[currentCountry][display.dimension]}}</span>
 	</div>
 	<div class="legend">
 		<li class="thresholds" ng-show="k==display.dimension" ng-repeat="(k,v) in display.dimensions">
@@ -21,6 +21,7 @@
 	</div>
 	<choropleth dimension="display.dimension"
 			    ready="hash.$resolved"
-				hash="hash">
+				hash="hash"
+				current-country="currentCountry">
 	</choropleth>
 </div>

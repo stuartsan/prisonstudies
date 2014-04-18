@@ -5,14 +5,8 @@
 
 var pdControllers = angular.module('prisonDataControllers', []);
 
-pdControllers.controller('MainCtrl', ['$scope', 'Country', 'validFilterSortDimensions', 
-function($scope, Country, validFilterSortDimensions){
-  	$scope.display = {
-		dimension: 'total_prisoners',
-		dimensions: validFilterSortDimensions,
-		descending: true,
-		currentCountry: null
-  	};
+pdControllers.controller('MainCtrl', ['$scope', 'Country', 
+function($scope, Country){
 	$scope.countries = Country.query();
 	$scope.hash = Country.queryHash();
 }]);
@@ -27,6 +21,11 @@ function($scope, $location, paths) {
 
 pdControllers.controller('CountryListCtrl', ['$scope', 'Country', 'validFilterSortDimensions', 
 function($scope, Country, validFilterSortDimensions){
+	$scope.display = {
+		dimension: 'total_prisoners',
+		dimensions: validFilterSortDimensions,
+		descending: 'true',
+  	};
 	$scope.orderFn = function(country) {
 		var x = country[$scope.display.dimension];
    		return x === null || x === undefined ? 0 : x;
@@ -35,12 +34,19 @@ function($scope, Country, validFilterSortDimensions){
 
 pdControllers.controller('MapCtrl', ['$scope', 'Country', 'validFilterSortDimensions',
 function($scope, Country, validFilterSortDimensions) {
-	
+	$scope.display = {
+			dimension: 'total_prisoners',
+			dimensions: validFilterSortDimensions,
+	};
 }]);
 
 pdControllers.controller('CompareCtrl', ['$scope', 'Country', 'validFilterSortDimensions',
 function($scope, Country, validFilterSortDimensions) {
 	$scope.selected = null;
+	$scope.display = {
+		dimension: 'total_prisoners',
+		dimensions: validFilterSortDimensions,
+	};
   	$scope.goDoStuff = function() {
   		//Nothing yet!
   	};
@@ -49,6 +55,10 @@ function($scope, Country, validFilterSortDimensions) {
 pdControllers.controller('TrendsCtrl', ['$scope', 'Country', 'validFilterSortDimensions',
 function($scope, Country, validFilterSortDimensions) {
 	$scope.selected = null;
+	$scope.display = {
+		dimension: 'total_prisoners',
+		dimensions: validFilterSortDimensions,
+	};
 }]);
 
 

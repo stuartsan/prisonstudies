@@ -4448,14 +4448,8 @@ pdApp.config(['$routeProvider', '$locationProvider', function($routeProvider, $l
 
 var pdControllers = angular.module('prisonDataControllers', []);
 
-pdControllers.controller('MainCtrl', ['$scope', 'Country', 'validFilterSortDimensions', 
-function($scope, Country, validFilterSortDimensions){
-  	$scope.display = {
-		dimension: 'total_prisoners',
-		dimensions: validFilterSortDimensions,
-		descending: true,
-		currentCountry: null
-  	};
+pdControllers.controller('MainCtrl', ['$scope', 'Country', 
+function($scope, Country){
 	$scope.countries = Country.query();
 	$scope.hash = Country.queryHash();
 }]);
@@ -4470,6 +4464,11 @@ function($scope, $location, paths) {
 
 pdControllers.controller('CountryListCtrl', ['$scope', 'Country', 'validFilterSortDimensions', 
 function($scope, Country, validFilterSortDimensions){
+	$scope.display = {
+		dimension: 'total_prisoners',
+		dimensions: validFilterSortDimensions,
+		descending: 'true',
+  	};
 	$scope.orderFn = function(country) {
 		var x = country[$scope.display.dimension];
    		return x === null || x === undefined ? 0 : x;
@@ -4478,12 +4477,19 @@ function($scope, Country, validFilterSortDimensions){
 
 pdControllers.controller('MapCtrl', ['$scope', 'Country', 'validFilterSortDimensions',
 function($scope, Country, validFilterSortDimensions) {
-	
+	$scope.display = {
+			dimension: 'total_prisoners',
+			dimensions: validFilterSortDimensions,
+	};
 }]);
 
 pdControllers.controller('CompareCtrl', ['$scope', 'Country', 'validFilterSortDimensions',
 function($scope, Country, validFilterSortDimensions) {
 	$scope.selected = null;
+	$scope.display = {
+		dimension: 'total_prisoners',
+		dimensions: validFilterSortDimensions,
+	};
   	$scope.goDoStuff = function() {
   		//Nothing yet!
   	};
@@ -4492,6 +4498,10 @@ function($scope, Country, validFilterSortDimensions) {
 pdControllers.controller('TrendsCtrl', ['$scope', 'Country', 'validFilterSortDimensions',
 function($scope, Country, validFilterSortDimensions) {
 	$scope.selected = null;
+	$scope.display = {
+		dimension: 'total_prisoners',
+		dimensions: validFilterSortDimensions,
+	};
 }]);
 
 
@@ -4529,7 +4539,8 @@ function($compile, dims, World) {
   		scope: {
   			dimension: '=',
   			ready: '=',
-  			hash: '='
+  			hash: '=',
+  			currentCountry: '='
   		},
   		link: function(scope, element, attrs) {
 
@@ -4610,11 +4621,12 @@ function($compile, dims, World) {
 
   			// Display a bit of data about hovered-over country in the template
 	    	element.bind('mouseover', function(e) {
-	    		if (e.target.attributes && e.target.attributes.cc) {
 	    			scope.$apply(function() {
-	    				scope.currentCountry = e.target.attributes.cc.value;
+	    				scope.currentCountry = 
+	    					e.target.attributes && e.target.attributes.cc ?  
+	    						e.target.attributes.cc.value 
+	    						: null;
 	    			});
-	    		}
 	    	});
   		}
   	};
@@ -4626,23 +4638,78 @@ pdDirectives.directive('barChart', [function() {
   			dimension: '=',
   			ready: '=',
   			hash: '=',
+  			selected: '=',
+  			label: '='
   		},
 		restrict: 'E',
 		replace: true,
 		link: function(scope, element, attrs) {
-			var width = 300;
-			var height = 300;
 
-			var svg = d3.select(element[0]).append('svg')
-				.attr('width', width)
-				.attr('height', height);
+			element.append('<h2 class="label">'+scope.label+'</h2>');
 
-			//Really do this stuff AFTER WATCHING READY...
+			var margin = {top: 45, right: 20, bottom: 20, left: 90},
+			    width = 300 - margin.left - margin.right,
+			    height = 300 - margin.top - margin.bottom;
 
-			svg.selectAll('.bar')
-				.data(scope.hash)
-				.enter().append('path');
+			var x = d3.scale.ordinal()
+			    .rangeRoundBands([0, width], .1);
 
+			var y = d3.scale.linear()
+			    .range([height, 0]);
+
+			var xAxis = d3.svg.axis()
+			    .scale(x)
+			    .orient("bottom")
+
+			var yAxis = d3.svg.axis()
+			    .scale(y)
+			    .orient("left")
+
+			var svg = d3.select(element[0]).append("svg")
+			    .attr("width", width + margin.left + margin.right)
+			    .attr("height", height + margin.top + margin.bottom)
+			  .append("g")
+			    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+			//Really do this stuff AFTER WATCHING READY TOO...
+			scope.$watch('selected', function(newVal, oldVal) {
+				if (newVal === oldVal) return;
+				svg.selectAll('g, rect').remove();
+				var selectedCountries = newVal;
+
+				x.domain(selectedCountries);
+
+				//Need min and max of all selected to set y domain
+				var selectedDimensionValues = selectedCountries.reduce(function(acc, item){
+						return acc.concat(scope.hash[item][scope.dimension]);
+					}, []);
+				var extent = d3.extent(selectedDimensionValues);
+				y.domain(extent);
+
+				svg.append("g")
+				  .attr("class", "x axis")
+				  .attr("transform", "translate(0," + height + ")")
+				  .call(xAxis);
+
+				svg.append("g")
+				  .attr("class", "y axis")
+				  .call(yAxis)
+				.append("text")
+				  .attr("transform", "rotate(-90)")
+				  .attr("y", 6)
+				  .attr("dy", ".71em")
+				  .style("text-anchor", "end");
+
+				svg.selectAll(".bar")
+					.data(selectedCountries)
+				.enter().append("rect")
+					.attr("class", "bar")
+					.attr("x", function(d) { return x(d); })
+					.attr("width", x.rangeBand())
+					.attr("y", function(d) { return y(scope.hash[d][scope.dimension]); })
+					.attr("height", function(d) { return height - y(scope.hash[d][scope.dimension]); });
+			});
+			
 
 		}
 	};
@@ -4659,6 +4726,7 @@ pdDirectives.directive('plot', [function() {
 		restrict: 'E',
 		replace: true,
 		link: function(scope, element, attrs) {
+
 			var margin = {top: 20, right: 20, bottom: 30, left: 100},
 			    width = 960 - margin.left - margin.right,
 			    height = 500 - margin.top - margin.bottom;
@@ -4690,12 +4758,11 @@ pdDirectives.directive('plot', [function() {
 			  .append("g")
 			    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 			
+			// If not ready = true things blow up!!
 			scope.$watch('selected', function(newVal, oldVal) {
+				if (newVal === oldVal) return;
 
-
-				if (newVal === null) return;
-
-				$('svg g g, svg path').remove();
+				svg.selectAll('g g, svg path').remove();
 				
 				var selectedCountries = newVal;
 				
@@ -4714,10 +4781,15 @@ pdDirectives.directive('plot', [function() {
 				var allPrisoners = arrayParty[1];
 				var allPops = arrayParty[2];
 
-				var label = "Total Prisoners";
+				var label = ({total_prisoners: 'Total Prisoners', 
+					prison_pop_rate: 'People imprisoned per 100k'})[scope.dimension];
 				
 				x.domain(d3.extent(allYears));
-				y.domain(d3.extent(allPrisoners)); //Make dynamic!
+
+				y.domain(d3.extent(
+					({total_prisoners: allPrisoners, 
+					prison_pop_rate: allPops})[scope.dimension]
+				));
 
 				svg.append("g")
 					.attr("class", "x axis")
@@ -4734,18 +4806,25 @@ pdDirectives.directive('plot', [function() {
 					.style("text-anchor", "end")
 					.text(label);
 				
-				selectedCountries.forEach(function(country) {
-					var countryData = scope.hash[country].trend;
+				selectedCountries.forEach(function(country, idx) {
 
+					var countryData = scope.hash[country].trend.map(function(item) {
+						var year = item[0],
+							dimension = ({total_prisoners: item[1], 
+										  prison_pop_rate: item[2]})[scope.dimension];
+							return [year, dimension];
+					});
+					var randomColor = '#'+Math.floor(Math.random()*16777215).toString(16);
 					svg.append("path")
 						.datum(countryData)
 						.attr("fill", "none")
 						.attr("stroke-width", "2px")
 						.attr("opacity", "0")
-						.attr("stroke", '#'+Math.floor(Math.random()*16777215).toString(16))
+						.attr("stroke", randomColor)
 						.attr("d", line)
 						.transition().duration(500)
 						.attr("opacity", "1");
+					$('.select2-search-choice').eq(idx).css('border-color', randomColor);
 				});
 			});
 		}
@@ -4862,7 +4941,7 @@ function($resource){
  */
  pdServices.factory('paths', function() {
  	var paths = [
-		{path: 'countries', label: 'List Countries'}, 
+		{path: 'countries', label: 'Lookup'}, 
 		{path: 'map', label: 'Map'}, 
 		{path: 'compare', label: 'Compare'},
 		{path: 'trends', label: 'Trends'},
@@ -4882,13 +4961,13 @@ function($resource){
  */
 pdServices.value('validFilterSortDimensions', { 
 	total_prisoners: {label: 'Total prisoners', thresholds: [25000,70000,150000,700000, 2500000]},
-	prison_pop_rate: {label: 'Prison population rate', thresholds: [2,50,250,600,750]},
-	female_prisoners: {label: 'Female prisoners', thresholds: [1,3,6,9,14]},
-	juveniles: {label: 'Juvenile prisoners', thresholds: [1,2,3,10,18]},
-	foreign_prisoners: {label: 'Foreign prisoners', thresholds: [1, 3, 6, 40, 100]},
+	prison_pop_rate: {label: 'Prison population rate (%)', thresholds: [2,50,250,600,750]},
+	female_prisoners: {label: 'Female prisoners (%)', thresholds: [1,3,6,9,14]},
+	juveniles: {label: 'Juvenile prisoners (%)', thresholds: [1,2,3,10,18]},
+	foreign_prisoners: {label: 'Foreign prisoners (%)', thresholds: [1, 3, 6, 40, 100]},
 	official_capacity: {label: 'Official capacity', thresholds: [25000,70000,150000,700000, 2500000]},
-	occupancy_level: {label: 'Occupancy level', thresholds: [40,75,100,200,450]},
+	occupancy_level: {label: 'Occupancy level (%)', thresholds: [40,75,100,200,450]},
 	total_establishments: {label: 'Total establishments', thresholds: [5,100,1000,2500,4600]},
-	pretrial_detainee_rate: {label: 'Pretrial detainees', thresholds: [3, 10, 25, 60, 90]}
+	pretrial_detainee_rate: {label: 'Pretrial detainees (%)', thresholds: [3, 10, 25, 60, 90]}
 });
 })(); 

@@ -3,16 +3,14 @@
 	<select class="multi-selector" ui-select2="{placeholder: 'Select countries...'}" multiple ng-model="selected">
 		<option ng-repeat="country in countries" ng-value="country.country_code">{{country.name}}</option>
 	</select>
-	<button ng-click="goDoStuff()">Go!</button>
 </div>
 <div>
-	<span>We're not yet doing anything with this data, stay tuned...</span><br>
-	<span>Selected: {{selected}}</span>
 	<bar-chart 
-		ng-repeat="dimension in display.dimensions"
-		dimension="display.dimension"
+		ng-repeat="(dimensionKey, dimensionVals) in display.dimensions"
+		dimension="dimensionKey"
+		label="dimensionVals.label"
 		ready="hash.$resolved"
-		countries="countries"
+		selected="selected"
 		hash="hash">
 	</bar-chart>
 </div>

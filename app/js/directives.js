@@ -25,7 +25,8 @@ function($compile, dims, World) {
   		scope: {
   			dimension: '=',
   			ready: '=',
-  			hash: '='
+  			hash: '=',
+  			currentCountry: '='
   		},
   		link: function(scope, element, attrs) {
 
@@ -106,11 +107,12 @@ function($compile, dims, World) {
 
   			// Display a bit of data about hovered-over country in the template
 	    	element.bind('mouseover', function(e) {
-	    		if (e.target.attributes && e.target.attributes.cc) {
 	    			scope.$apply(function() {
-	    				scope.currentCountry = e.target.attributes.cc.value;
+	    				scope.currentCountry = 
+	    					e.target.attributes && e.target.attributes.cc ?  
+	    						e.target.attributes.cc.value 
+	    						: null;
 	    			});
-	    		}
 	    	});
   		}
   	};
@@ -122,23 +124,78 @@ pdDirectives.directive('barChart', [function() {
   			dimension: '=',
   			ready: '=',
   			hash: '=',
+  			selected: '=',
+  			label: '='
   		},
 		restrict: 'E',
 		replace: true,
 		link: function(scope, element, attrs) {
-			var width = 300;
-			var height = 300;
 
-			var svg = d3.select(element[0]).append('svg')
-				.attr('width', width)
-				.attr('height', height);
+			element.append('<h2 class="label">'+scope.label+'</h2>');
 
-			//Really do this stuff AFTER WATCHING READY...
+			var margin = {top: 45, right: 20, bottom: 20, left: 90},
+			    width = 300 - margin.left - margin.right,
+			    height = 300 - margin.top - margin.bottom;
 
-			svg.selectAll('.bar')
-				.data(scope.hash)
-				.enter().append('path');
+			var x = d3.scale.ordinal()
+			    .rangeRoundBands([0, width], .1);
 
+			var y = d3.scale.linear()
+			    .range([height, 0]);
+
+			var xAxis = d3.svg.axis()
+			    .scale(x)
+			    .orient("bottom")
+
+			var yAxis = d3.svg.axis()
+			    .scale(y)
+			    .orient("left")
+
+			var svg = d3.select(element[0]).append("svg")
+			    .attr("width", width + margin.left + margin.right)
+			    .attr("height", height + margin.top + margin.bottom)
+			  .append("g")
+			    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+			//Really do this stuff AFTER WATCHING READY TOO...
+			scope.$watch('selected', function(newVal, oldVal) {
+				if (newVal === oldVal) return;
+				svg.selectAll('g, rect').remove();
+				var selectedCountries = newVal;
+
+				x.domain(selectedCountries);
+
+				//Need min and max of all selected to set y domain
+				var selectedDimensionValues = selectedCountries.reduce(function(acc, item){
+						return acc.concat(scope.hash[item][scope.dimension]);
+					}, []);
+				var extent = d3.extent(selectedDimensionValues);
+				y.domain(extent);
+
+				svg.append("g")
+				  .attr("class", "x axis")
+				  .attr("transform", "translate(0," + height + ")")
+				  .call(xAxis);
+
+				svg.append("g")
+				  .attr("class", "y axis")
+				  .call(yAxis)
+				.append("text")
+				  .attr("transform", "rotate(-90)")
+				  .attr("y", 6)
+				  .attr("dy", ".71em")
+				  .style("text-anchor", "end");
+
+				svg.selectAll(".bar")
+					.data(selectedCountries)
+				.enter().append("rect")
+					.attr("class", "bar")
+					.attr("x", function(d) { return x(d); })
+					.attr("width", x.rangeBand())
+					.attr("y", function(d) { return y(scope.hash[d][scope.dimension]); })
+					.attr("height", function(d) { return height - y(scope.hash[d][scope.dimension]); });
+			});
+			
 
 		}
 	};
@@ -155,6 +212,7 @@ pdDirectives.directive('plot', [function() {
 		restrict: 'E',
 		replace: true,
 		link: function(scope, element, attrs) {
+
 			var margin = {top: 20, right: 20, bottom: 30, left: 100},
 			    width = 960 - margin.left - margin.right,
 			    height = 500 - margin.top - margin.bottom;
@@ -186,12 +244,11 @@ pdDirectives.directive('plot', [function() {
 			  .append("g")
 			    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 			
+			// If not ready = true things blow up!!
 			scope.$watch('selected', function(newVal, oldVal) {
+				if (newVal === oldVal) return;
 
-
-				if (newVal === null) return;
-
-				$('svg g g, svg path').remove();
+				svg.selectAll('g g, svg path').remove();
 				
 				var selectedCountries = newVal;
 				
@@ -210,10 +267,15 @@ pdDirectives.directive('plot', [function() {
 				var allPrisoners = arrayParty[1];
 				var allPops = arrayParty[2];
 
-				var label = "Total Prisoners";
+				var label = ({total_prisoners: 'Total Prisoners', 
+					prison_pop_rate: 'People imprisoned per 100k'})[scope.dimension];
 				
 				x.domain(d3.extent(allYears));
-				y.domain(d3.extent(allPrisoners)); //Make dynamic!
+
+				y.domain(d3.extent(
+					({total_prisoners: allPrisoners, 
+					prison_pop_rate: allPops})[scope.dimension]
+				));
 
 				svg.append("g")
 					.attr("class", "x axis")
@@ -230,18 +292,25 @@ pdDirectives.directive('plot', [function() {
 					.style("text-anchor", "end")
 					.text(label);
 				
-				selectedCountries.forEach(function(country) {
-					var countryData = scope.hash[country].trend;
+				selectedCountries.forEach(function(country, idx) {
 
+					var countryData = scope.hash[country].trend.map(function(item) {
+						var year = item[0],
+							dimension = ({total_prisoners: item[1], 
+										  prison_pop_rate: item[2]})[scope.dimension];
+							return [year, dimension];
+					});
+					var randomColor = '#'+Math.floor(Math.random()*16777215).toString(16);
 					svg.append("path")
 						.datum(countryData)
 						.attr("fill", "none")
 						.attr("stroke-width", "2px")
 						.attr("opacity", "0")
-						.attr("stroke", '#'+Math.floor(Math.random()*16777215).toString(16))
+						.attr("stroke", randomColor)
 						.attr("d", line)
 						.transition().duration(500)
 						.attr("opacity", "1");
+					$('.select2-search-choice').eq(idx).css('border-color', randomColor);
 				});
 			});
 		}
