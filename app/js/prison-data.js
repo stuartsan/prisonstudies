@@ -4426,6 +4426,10 @@ pdApp.config(['$routeProvider', '$locationProvider', function($routeProvider, $l
 			templateUrl: 'app/partials/compare.html',
 			controller: 'CompareCtrl'
 		})
+		.when('/trends', {
+			templateUrl: 'app/partials/trends.html',
+			controller: 'TrendsCtrl'
+		})
 		.when('/about', {
 			templateUrl: 'app/partials/about.html',
 			controller: 'AboutCtrl'
@@ -4444,6 +4448,18 @@ pdApp.config(['$routeProvider', '$locationProvider', function($routeProvider, $l
 
 var pdControllers = angular.module('prisonDataControllers', []);
 
+pdControllers.controller('MainCtrl', ['$scope', 'Country', 'validFilterSortDimensions', 
+function($scope, Country, validFilterSortDimensions){
+  	$scope.display = {
+		dimension: 'total_prisoners',
+		dimensions: validFilterSortDimensions,
+		descending: true,
+		currentCountry: null
+  	};
+	$scope.countries = Country.query();
+	$scope.hash = Country.queryHash();
+}]);
+
 pdControllers.controller('navCtrl', ['$scope', '$location', 'paths', 
 function($scope, $location, paths) {
 	$scope.paths = paths.paths;
@@ -4454,12 +4470,6 @@ function($scope, $location, paths) {
 
 pdControllers.controller('CountryListCtrl', ['$scope', 'Country', 'validFilterSortDimensions', 
 function($scope, Country, validFilterSortDimensions){
-  	$scope.display = {
-		dimension: 'total_prisoners',
-		dimensions: validFilterSortDimensions,
-		descending: true
-  	};
-	$scope.countries = Country.query();
 	$scope.orderFn = function(country) {
 		var x = country[$scope.display.dimension];
    		return x === null || x === undefined ? 0 : x;
@@ -4468,25 +4478,23 @@ function($scope, Country, validFilterSortDimensions){
 
 pdControllers.controller('MapCtrl', ['$scope', 'Country', 'validFilterSortDimensions',
 function($scope, Country, validFilterSortDimensions) {
-  	$scope.display = {
-		dimensions: validFilterSortDimensions,
-		dimension: 'total_prisoners',
-		currentCountry: null
-  	};
-	$scope.ready = false;
-	$scope.hash = Country.queryHash(function() {
-		$scope.ready = true;
-	});
+	
 }]);
 
-pdControllers.controller('CompareCtrl', ['$scope', 'Country',
-function($scope, Country) {
+pdControllers.controller('CompareCtrl', ['$scope', 'Country', 'validFilterSortDimensions',
+function($scope, Country, validFilterSortDimensions) {
 	$scope.selected = null;
-  	$scope.countries = Country.query();
   	$scope.goDoStuff = function() {
   		//Nothing yet!
   	};
 }]);
+
+pdControllers.controller('TrendsCtrl', ['$scope', 'Country', 'validFilterSortDimensions',
+function($scope, Country, validFilterSortDimensions) {
+	$scope.selected = null;
+}]);
+
+
 
 pdControllers.controller('AboutCtrl', ['$scope',
 function($scope, Country) {
@@ -4611,6 +4619,139 @@ function($compile, dims, World) {
   		}
   	};
 }]);
+
+pdDirectives.directive('barChart', [function() {
+	return {
+		scope: {
+  			dimension: '=',
+  			ready: '=',
+  			hash: '=',
+  		},
+		restrict: 'E',
+		replace: true,
+		link: function(scope, element, attrs) {
+			var width = 300;
+			var height = 300;
+
+			var svg = d3.select(element[0]).append('svg')
+				.attr('width', width)
+				.attr('height', height);
+
+			//Really do this stuff AFTER WATCHING READY...
+
+			svg.selectAll('.bar')
+				.data(scope.hash)
+				.enter().append('path');
+
+
+		}
+	};
+}]);
+
+pdDirectives.directive('plot', [function() {
+	return {
+		scope: {
+  			dimension: '=',
+  			ready: '=',
+  			hash: '=',
+  			selected: '='
+  		},
+		restrict: 'E',
+		replace: true,
+		link: function(scope, element, attrs) {
+			var margin = {top: 20, right: 20, bottom: 30, left: 100},
+			    width = 960 - margin.left - margin.right,
+			    height = 500 - margin.top - margin.bottom;
+
+			var x = d3.scale.linear()
+				.range([0, width]);
+
+			var y = d3.scale.log()
+				.range([height, 0]);
+
+			var xAxis = d3.svg.axis()
+			    .scale(x)
+			    .orient("bottom")
+			    .tickFormat(d3.format("d"));
+
+			var yAxis = d3.svg.axis()
+			    .scale(y)
+			    .orient("left")
+			    .tickFormat(d3.format("r"));
+
+			var line = d3.svg.line()
+			    .x(function(d) { return x(d[0]); })	
+			    .y(function(d) { return y(d[1]); });
+
+
+			var svg = d3.select(element[0]).append("svg")
+			    .attr("width", width + margin.left + margin.right)
+			    .attr("height", height + margin.top + margin.bottom)
+			  .append("g")
+			    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+			
+			scope.$watch('selected', function(newVal, oldVal) {
+
+
+				if (newVal === null) return;
+
+				$('svg g g, svg path').remove();
+				
+				var selectedCountries = newVal;
+				
+				var arrayParty = selectedCountries.reduce(function(acc, item, idx){
+					return acc.concat(scope.hash[item].trend);
+				}, [])
+					.reduce(function(acc, item, idx) {
+						acc[0].push(item[0]);
+						acc[1].push(item[1]);
+						acc[2].push(item[2]);
+						return acc;
+					}, [[],[],[]]);
+
+
+				var allYears = arrayParty[0];
+				var allPrisoners = arrayParty[1];
+				var allPops = arrayParty[2];
+
+				var label = "Total Prisoners";
+				
+				x.domain(d3.extent(allYears));
+				y.domain(d3.extent(allPrisoners)); //Make dynamic!
+
+				svg.append("g")
+					.attr("class", "x axis")
+					.attr("transform", "translate(0," + height + ")")
+					.call(xAxis);
+
+				svg.append("g")
+					.attr("class", "y axis")
+					.call(yAxis)
+				.append("text")
+					.attr("transform", "rotate(-90)")
+					.attr("y", 6)
+					.attr("dy", ".71em")
+					.style("text-anchor", "end")
+					.text(label);
+				
+				selectedCountries.forEach(function(country) {
+					var countryData = scope.hash[country].trend;
+
+					svg.append("path")
+						.datum(countryData)
+						.attr("fill", "none")
+						.attr("stroke-width", "2px")
+						.attr("opacity", "0")
+						.attr("stroke", '#'+Math.floor(Math.random()*16777215).toString(16))
+						.attr("d", line)
+						.transition().duration(500)
+						.attr("opacity", "1");
+				});
+			});
+		}
+	};
+}]);
+
 })();
 (function () { 
 'use strict';
@@ -4724,6 +4865,7 @@ function($resource){
 		{path: 'countries', label: 'List Countries'}, 
 		{path: 'map', label: 'Map'}, 
 		{path: 'compare', label: 'Compare'},
+		{path: 'trends', label: 'Trends'},
 		{path: 'about', label: 'About'}
 	];
  	return {

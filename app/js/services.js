@@ -51,6 +51,7 @@ function($resource){
 		{path: 'countries', label: 'List Countries'}, 
 		{path: 'map', label: 'Map'}, 
 		{path: 'compare', label: 'Compare'},
+		{path: 'trends', label: 'Trends'},
 		{path: 'about', label: 'About'}
 	];
  	return {

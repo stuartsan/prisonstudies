@@ -115,4 +115,137 @@ function($compile, dims, World) {
   		}
   	};
 }]);
+
+pdDirectives.directive('barChart', [function() {
+	return {
+		scope: {
+  			dimension: '=',
+  			ready: '=',
+  			hash: '=',
+  		},
+		restrict: 'E',
+		replace: true,
+		link: function(scope, element, attrs) {
+			var width = 300;
+			var height = 300;
+
+			var svg = d3.select(element[0]).append('svg')
+				.attr('width', width)
+				.attr('height', height);
+
+			//Really do this stuff AFTER WATCHING READY...
+
+			svg.selectAll('.bar')
+				.data(scope.hash)
+				.enter().append('path');
+
+
+		}
+	};
+}]);
+
+pdDirectives.directive('plot', [function() {
+	return {
+		scope: {
+  			dimension: '=',
+  			ready: '=',
+  			hash: '=',
+  			selected: '='
+  		},
+		restrict: 'E',
+		replace: true,
+		link: function(scope, element, attrs) {
+			var margin = {top: 20, right: 20, bottom: 30, left: 100},
+			    width = 960 - margin.left - margin.right,
+			    height = 500 - margin.top - margin.bottom;
+
+			var x = d3.scale.linear()
+				.range([0, width]);
+
+			var y = d3.scale.log()
+				.range([height, 0]);
+
+			var xAxis = d3.svg.axis()
+			    .scale(x)
+			    .orient("bottom")
+			    .tickFormat(d3.format("d"));
+
+			var yAxis = d3.svg.axis()
+			    .scale(y)
+			    .orient("left")
+			    .tickFormat(d3.format("r"));
+
+			var line = d3.svg.line()
+			    .x(function(d) { return x(d[0]); })	
+			    .y(function(d) { return y(d[1]); });
+
+
+			var svg = d3.select(element[0]).append("svg")
+			    .attr("width", width + margin.left + margin.right)
+			    .attr("height", height + margin.top + margin.bottom)
+			  .append("g")
+			    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+			
+			scope.$watch('selected', function(newVal, oldVal) {
+
+
+				if (newVal === null) return;
+
+				$('svg g g, svg path').remove();
+				
+				var selectedCountries = newVal;
+				
+				var arrayParty = selectedCountries.reduce(function(acc, item, idx){
+					return acc.concat(scope.hash[item].trend);
+				}, [])
+					.reduce(function(acc, item, idx) {
+						acc[0].push(item[0]);
+						acc[1].push(item[1]);
+						acc[2].push(item[2]);
+						return acc;
+					}, [[],[],[]]);
+
+
+				var allYears = arrayParty[0];
+				var allPrisoners = arrayParty[1];
+				var allPops = arrayParty[2];
+
+				var label = "Total Prisoners";
+				
+				x.domain(d3.extent(allYears));
+				y.domain(d3.extent(allPrisoners)); //Make dynamic!
+
+				svg.append("g")
+					.attr("class", "x axis")
+					.attr("transform", "translate(0," + height + ")")
+					.call(xAxis);
+
+				svg.append("g")
+					.attr("class", "y axis")
+					.call(yAxis)
+				.append("text")
+					.attr("transform", "rotate(-90)")
+					.attr("y", 6)
+					.attr("dy", ".71em")
+					.style("text-anchor", "end")
+					.text(label);
+				
+				selectedCountries.forEach(function(country) {
+					var countryData = scope.hash[country].trend;
+
+					svg.append("path")
+						.datum(countryData)
+						.attr("fill", "none")
+						.attr("stroke-width", "2px")
+						.attr("opacity", "0")
+						.attr("stroke", '#'+Math.floor(Math.random()*16777215).toString(16))
+						.attr("d", line)
+						.transition().duration(500)
+						.attr("opacity", "1");
+				});
+			});
+		}
+	};
+}]);
+
 })();

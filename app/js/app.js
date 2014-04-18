@@ -25,6 +25,10 @@ pdApp.config(['$routeProvider', '$locationProvider', function($routeProvider, $l
 			templateUrl: 'app/partials/compare.html',
 			controller: 'CompareCtrl'
 		})
+		.when('/trends', {
+			templateUrl: 'app/partials/trends.html',
+			controller: 'TrendsCtrl'
+		})
 		.when('/about', {
 			templateUrl: 'app/partials/about.html',
 			controller: 'AboutCtrl'

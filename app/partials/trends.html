@@ -1,19 +1,19 @@
-<div id="compare">
+<div id="trends">
 <div class="controls">
 	<select class="multi-selector" ui-select2="{placeholder: 'Select countries...'}" multiple ng-model="selected">
 		<option ng-repeat="country in countries" ng-value="country.country_code">{{country.name}}</option>
 	</select>
-	<button ng-click="goDoStuff()">Go!</button>
+	<select ng-model="display.dimension">
+		<option value="total_prisoners">Total prisoners</option>
+		<option value="xxxxxxxxxx">Prison population rate</option>
+	</select>
 </div>
 <div>
-	<span>We're not yet doing anything with this data, stay tuned...</span><br>
-	<span>Selected: {{selected}}</span>
-	<bar-chart 
-		ng-repeat="dimension in display.dimensions"
+	<plot 
 		dimension="display.dimension"
 		ready="hash.$resolved"
-		countries="countries"
-		hash="hash">
-	</bar-chart>
+		hash="hash"
+		selected="selected">
+	</plot>
 </div>
 </div>
