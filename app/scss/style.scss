@@ -52,6 +52,29 @@ ul, li {
 	margin: 0;
 }
 
+@mixin threes {
+	padding: .8em;
+	margin: 0 1% .7em 0;
+	background-color: darken($off-white, 10%);
+	float: left;
+	width: 30%;
+	height: 300px;
+	&:nth-child(3n + 3) {
+		margin-right: 0;
+	}
+}
+
+@mixin clearfix {
+	&:before,
+	&:after {
+	    content: " ";
+	    display: table;
+	}
+	&:after {
+	    clear: both;
+	}
+}
+
 #main {
 	background-color: $off-white;
 	padding: 1em;
@@ -106,7 +129,7 @@ ul, li {
  */
 
 #countries {
-	overflow: hidden;
+	@include clearfix;
 	input[type="text"] {
 		width: 20em;
 	}
@@ -114,15 +137,7 @@ ul, li {
 		width: 100%;
 	}
 	.country {
-		padding: .8em;
-		margin: 0 1% .7em 0;
-		background-color: darken($off-white, 10%);
-		float: left;
-		width: 30%;
-		height: 300px;
-		&:nth-child(3n + 3) {
-			margin-right: 0;
-		}
+		@include threes;
 	}
 	.comment-entry {
 		margin-left: 2em;
@@ -186,6 +201,16 @@ ul, li {
   fill: none;
   stroke: #000;
   shape-rendering: crispEdges;
+}
+
+/**
+ * Compare
+ */
+#compare {
+	@include clearfix;
+	bar-chart {
+		@include threes;
+	}
 }
 
 

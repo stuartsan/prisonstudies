@@ -4630,19 +4630,74 @@ pdDirectives.directive('barChart', [function() {
 		restrict: 'E',
 		replace: true,
 		link: function(scope, element, attrs) {
-			var width = 300;
-			var height = 300;
+			var margin = {top: 20, right: 20, bottom: 30, left: 90},
+			    width = 300 - margin.left - margin.right,
+			    height = 300 - margin.top - margin.bottom;
 
-			var svg = d3.select(element[0]).append('svg')
-				.attr('width', width)
-				.attr('height', height);
+			var x = d3.scale.ordinal()
+			    .rangeRoundBands([0, width], .1);
+
+			var y = d3.scale.linear()
+			    .range([height, 0]);
+
+			var xAxis = d3.svg.axis()
+			    .scale(x)
+			    .orient("bottom")
+
+
+			var yAxis = d3.svg.axis()
+			    .scale(y)
+			    .orient("left")
+		
+
+			var svg = d3.select(element[0]).append("svg")
+			    .attr("width", width + margin.left + margin.right)
+			    .attr("height", height + margin.top + margin.bottom)
+			  .append("g")
+			    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 			//Really do this stuff AFTER WATCHING READY...
 
-			svg.selectAll('.bar')
-				.data(scope.hash)
-				.enter().append('path');
+			// scope.$watch('selected', function(newVal, oldVal) {
+			// 	if (newVal === oldVal) return;
+			// 	var selectedCountries = newVal;
 
+
+			// });
+			var selectedCountries = ['USA', 'CAN', 'KOR'];
+
+			x.domain(selectedCountries);
+
+			//Need min and max of all selected to set y domain
+			var selectedDimensionValues = selectedCountries.reduce(function(acc, item, idx){
+					return acc.concat(scope.hash[item][scope.dimension]);
+				}, [])
+			
+			y.domain(d3.extent(selectedDimensionValues));
+
+			svg.append("g")
+			  .attr("class", "x axis")
+			  .attr("transform", "translate(0," + height + ")")
+			  .call(xAxis);
+
+			svg.append("g")
+			  .attr("class", "y axis")
+			  .call(yAxis)
+			.append("text")
+			  .attr("transform", "rotate(-90)")
+			  .attr("y", 6)
+			  .attr("dy", ".71em")
+			  .style("text-anchor", "end")
+			  .text("Label...");
+
+			svg.selectAll(".bar")
+				.data(selectedCountries)
+			.enter().append("rect")
+				.attr("class", "bar")
+				.attr("x", function(d) { return x(d); })
+				.attr("width", x.rangeBand())
+				.attr("y", function(d) { return y(scope.hash[d][scope.dimension]); })
+				.attr("height", function(d) { return height - y(scope.hash[d][scope.dimension]); });
 
 		}
 	};
@@ -4690,10 +4745,11 @@ pdDirectives.directive('plot', [function() {
 			  .append("g")
 			    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 			
+			// If not ready = true things blow up!!
 			scope.$watch('selected', function(newVal, oldVal) {
 
 
-				if (newVal === null) return;
+				if (newVal === oldVal) return;
 
 				$('svg g g, svg path').remove();
 				
