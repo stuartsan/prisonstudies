@@ -5,6 +5,18 @@
 
 var pdControllers = angular.module('prisonDataControllers', []);
 
+pdControllers.controller('MainCtrl', ['$scope', 'Country', 'validFilterSortDimensions', 
+function($scope, Country, validFilterSortDimensions){
+  	$scope.display = {
+		dimension: 'total_prisoners',
+		dimensions: validFilterSortDimensions,
+		descending: true,
+		currentCountry: null
+  	};
+	$scope.countries = Country.query();
+	$scope.hash = Country.queryHash();
+}]);
+
 pdControllers.controller('navCtrl', ['$scope', '$location', 'paths', 
 function($scope, $location, paths) {
 	$scope.paths = paths.paths;
@@ -15,12 +27,6 @@ function($scope, $location, paths) {
 
 pdControllers.controller('CountryListCtrl', ['$scope', 'Country', 'validFilterSortDimensions', 
 function($scope, Country, validFilterSortDimensions){
-  	$scope.display = {
-		dimension: 'total_prisoners',
-		dimensions: validFilterSortDimensions,
-		descending: true
-  	};
-	$scope.countries = Country.query();
 	$scope.orderFn = function(country) {
 		var x = country[$scope.display.dimension];
    		return x === null || x === undefined ? 0 : x;
@@ -29,25 +35,23 @@ function($scope, Country, validFilterSortDimensions){
 
 pdControllers.controller('MapCtrl', ['$scope', 'Country', 'validFilterSortDimensions',
 function($scope, Country, validFilterSortDimensions) {
-  	$scope.display = {
-		dimensions: validFilterSortDimensions,
-		dimension: 'total_prisoners',
-		currentCountry: null
-  	};
-	$scope.ready = false;
-	$scope.hash = Country.queryHash(function() {
-		$scope.ready = true;
-	});
+	
 }]);
 
-pdControllers.controller('CompareCtrl', ['$scope', 'Country',
-function($scope, Country) {
+pdControllers.controller('CompareCtrl', ['$scope', 'Country', 'validFilterSortDimensions',
+function($scope, Country, validFilterSortDimensions) {
 	$scope.selected = null;
-  	$scope.countries = Country.query();
   	$scope.goDoStuff = function() {
   		//Nothing yet!
   	};
 }]);
+
+pdControllers.controller('TrendsCtrl', ['$scope', 'Country', 'validFilterSortDimensions',
+function($scope, Country, validFilterSortDimensions) {
+	$scope.selected = null;
+}]);
+
+
 
 pdControllers.controller('AboutCtrl', ['$scope',
 function($scope, Country) {

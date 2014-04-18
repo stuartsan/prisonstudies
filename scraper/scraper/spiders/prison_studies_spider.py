@@ -1,3 +1,4 @@
+import re
 from scrapy.contrib.spiders import CrawlSpider, Rule
 from scrapy.contrib.linkextractors.sgml import SgmlLinkExtractor
 from scrapy.selector import Selector
@@ -39,6 +40,19 @@ class PrisonStudiesSpider(CrawlSpider):
     
     return lst[0].extract()
 
+  def extractTrends(self, lst):
+    if not lst:
+        return None
+
+    def extract(idx, sel):
+        data = sel.css('td span::text').extract()[0] if idx == 0 else sel.css('td::text').extract()[0]
+        return int(re.search(r'\d+', data.strip().replace(',', '')).group())
+
+    cells = [row.css('td') for row in lst]
+    extracted = [[extract(idx, sel) for (idx, sel) in enumerate(row) ] for row in cells]
+    return extracted
+
+
   def parse_country(self, response):
     
     #First grab all the stuff we need via CSS selectors
@@ -62,6 +76,7 @@ class PrisonStudiesSpider(CrawlSpider):
     foreign_prisoners_comment = sel.css('.field-collection-item-field-foreign-prisoners .field-name-field-comment .field-item::text') 
     occupancy_level =  sel.css('.field-collection-item-field-occupancy-level .field-name-field-percentage .field-item::text') 
     occupancy_level_comment =  sel.css('.field-collection-item-field-occupancy-level .field-name-field-comment .field-item::text') 
+    trend = sel.css('.view-data-previous-year-prison-population-trend .views-table tr')
 
     #Then plug it in here
     item = Country()
@@ -84,6 +99,7 @@ class PrisonStudiesSpider(CrawlSpider):
     item['official_capacity_comment'] = self.extractString(official_capacity_comment)
     item['occupancy_level'] = self.extractPercentage(occupancy_level)
     item['occupancy_level_comment'] = self.extractString(occupancy_level_comment)
+    item['trend'] = self.extractTrends(trend)
     item['pso_url'] = response.url
 
     return item

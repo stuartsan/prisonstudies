@@ -132,3 +132,11 @@ ul, li {
   height: 1em;
   width: 1em;
   border: solid 1px #3f3f3f; }
+
+/**
+ * Trends
+ */
+.axis path, .axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges; }

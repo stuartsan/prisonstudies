@@ -20,10 +20,6 @@ module.exports = function(grunt) {
 					'app/js/services.js'
 				],
 				dest: 'app/js/<%= pkg.name %>.js'
-			},
-			css: {
-				src: ['bower_components/select2/select2.css', 'app/css/style.css'],
-				dest: 'app/css/<%= pkg.name %>.css'
 			}
 		},
 		uglify: {
@@ -40,6 +36,19 @@ module.exports = function(grunt) {
 
 			}
 		},
+		copy: {
+			build: {
+				files: [
+					{
+						expand: true,
+						flatten: true,
+						src: ['bower_components/select2/select2.css', 'bower_components/select2/*.gif', 'bower_components/select2/*.png'],
+						dest: 'app/css/vendor/select2'
+					}
+
+				]
+			}
+		},
 		jshint: {
 			build: {
 				src: ['Gruntfile.js', 'app/js/**/*.js', '!app/js/<%= pkg.name %>.js', '!app/js/<%= pkg.name %>.min.js']
@@ -48,7 +57,7 @@ module.exports = function(grunt) {
 		sass: {
 			build: {
 				src: ['app/scss/*.scss'],
-				dest: 'app/css/style.css',
+				dest: 'app/css/<%= pkg.name %>.css',
 				options: {
 					outputStyle: 'nested'
 				}
@@ -64,7 +73,7 @@ module.exports = function(grunt) {
 			},
 			js: {
 				files: ['app/js/**/*.js', '!app/js/prison-data.js', '!app/js/prison-data.min.js'],
-				tasks: ['concat:build']
+				tasks: ['concat:js']
 			},
 			html: {
 				files: ['index.html', 'app/**/*.html']
@@ -77,8 +86,9 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-contrib-jshint');
+	grunt.loadNpmTasks('grunt-contrib-copy');
 
-	grunt.registerTask('default', ['sass', 'jshint', 'concat']);
+	grunt.registerTask('default', ['sass', 'jshint', 'concat', 'copy']);
 	grunt.registerTask('prod', ['sass', 'jshint', 'uglify', 'concat', 'jshint']);
 
 };
