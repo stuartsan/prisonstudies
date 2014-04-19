@@ -140,38 +140,39 @@ pdDirectives.directive('barChart', [function() {
 			var x = d3.scale.ordinal()
 			    .rangeRoundBands([0, width], .1);
 
+
 			var y = d3.scale.linear()
 			    .range([height, 0]);
 
 			var xAxis = d3.svg.axis()
 			    .scale(x)
-			    .orient("bottom")
+			    .orient("bottom");
 
 			var yAxis = d3.svg.axis()
 			    .scale(y)
-			    .orient("left")
+			    .orient("left");
 
 			var svg = d3.select(element[0]).append("svg")
 			    .attr("width", width + margin.left + margin.right)
 			    .attr("height", height + margin.top + margin.bottom)
-			  .append("g")
-			    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+				.append("g")
+			    	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 			//Really do this stuff AFTER WATCHING READY TOO...
 			scope.$watch('selected', function(newVal, oldVal) {
 				if (newVal === oldVal) return;
 				svg.selectAll('g, rect').remove();
+
 				var selectedCountries = newVal;
-
 				x.domain(selectedCountries);
-
+				
 				//Need min and max of all selected to set y domain
 				var selectedDimensionValues = selectedCountries.reduce(function(acc, item){
 						return acc.concat(scope.hash[item][scope.dimension]);
 					}, []);
-				var extent = d3.extent(selectedDimensionValues);
-				y.domain(extent);
+				y.domain(d3.extent(selectedDimensionValues));
 
+				//Append axes
 				svg.append("g")
 				  .attr("class", "x axis")
 				  .attr("transform", "translate(0," + height + ")")
@@ -186,10 +187,10 @@ pdDirectives.directive('barChart', [function() {
 				  .attr("dy", ".71em")
 				  .style("text-anchor", "end");
 
+				//Draw bars
 				svg.selectAll(".bar")
 					.data(selectedCountries)
 				.enter().append("rect")
-					.attr("class", "bar")
 					.attr("x", function(d) { return x(d); })
 					.attr("width", x.rangeBand())
 					.attr("y", function(d) { return y(scope.hash[d][scope.dimension]); })
@@ -212,6 +213,8 @@ pdDirectives.directive('plot', [function() {
 		restrict: 'E',
 		replace: true,
 		link: function(scope, element, attrs) {
+
+			//General D3 setup
 
 			var margin = {top: 20, right: 20, bottom: 30, left: 100},
 			    width = 960 - margin.left - margin.right,
@@ -241,17 +244,19 @@ pdDirectives.directive('plot', [function() {
 			var svg = d3.select(element[0]).append("svg")
 			    .attr("width", width + margin.left + margin.right)
 			    .attr("height", height + margin.top + margin.bottom)
-			  .append("g")
-			    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+			  	.append("g")
+			    	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 			
-			// If not ready = true things blow up!!
+			// Re-draw lines when set of selected countries changes
 			scope.$watch('selected', function(newVal, oldVal) {
 				if (newVal === oldVal) return;
-
 				svg.selectAll('g g, svg path').remove();
-				
 				var selectedCountries = newVal;
-				
+				/**
+				 * Transform the data to combine matching data fields
+				 * across all the countries. We need to find the min and max
+				 * values for each field to calculate x and y domain.
+				 */
 				var arrayParty = selectedCountries.reduce(function(acc, item, idx){
 					return acc.concat(scope.hash[item].trend);
 				}, [])
@@ -262,13 +267,9 @@ pdDirectives.directive('plot', [function() {
 						return acc;
 					}, [[],[],[]]);
 
-
 				var allYears = arrayParty[0];
 				var allPrisoners = arrayParty[1];
 				var allPops = arrayParty[2];
-
-				var label = ({total_prisoners: 'Total Prisoners', 
-					prison_pop_rate: 'People imprisoned per 100k'})[scope.dimension];
 				
 				x.domain(d3.extent(allYears));
 
@@ -277,6 +278,10 @@ pdDirectives.directive('plot', [function() {
 					prison_pop_rate: allPops})[scope.dimension]
 				));
 
+				var label = ({total_prisoners: 'Total Prisoners', 
+					prison_pop_rate: 'People imprisoned per 100k'})[scope.dimension];
+
+				// Append axes
 				svg.append("g")
 					.attr("class", "x axis")
 					.attr("transform", "translate(0," + height + ")")
@@ -292,15 +297,27 @@ pdDirectives.directive('plot', [function() {
 					.style("text-anchor", "end")
 					.text(label);
 				
+				// For each country, plot a line.
 				selectedCountries.forEach(function(country, idx) {
 
+					/**
+					 * Each trend data point is represented by an array consisting of
+					 * [year, total_prisoners, prison_pop_rate]. So depending on 
+					 * the selected dimension, we only pass along the year and one
+					 * data point representing the dimension to be plotted.
+					 */
 					var countryData = scope.hash[country].trend.map(function(item) {
 						var year = item[0],
 							dimension = ({total_prisoners: item[1], 
 										  prison_pop_rate: item[2]})[scope.dimension];
 							return [year, dimension];
 					});
-					var randomColor = '#'+Math.floor(Math.random()*16777215).toString(16);
+
+					// Calculate a random color for the plotted line and its corresponding
+					// item in the select2 select component
+					var randomColor = d3.scale.category20().domain(selectedCountries)(country); 
+					$('.select2-search-choice').eq(idx).css('border-color', randomColor);
+					
 					svg.append("path")
 						.datum(countryData)
 						.attr("fill", "none")
@@ -310,7 +327,7 @@ pdDirectives.directive('plot', [function() {
 						.attr("d", line)
 						.transition().duration(500)
 						.attr("opacity", "1");
-					$('.select2-search-choice').eq(idx).css('border-color', randomColor);
+
 				});
 			});
 		}
