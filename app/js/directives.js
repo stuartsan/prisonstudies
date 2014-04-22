@@ -166,11 +166,12 @@ pdDirectives.directive('barChart', [function() {
 				var selectedCountries = newVal;
 				x.domain(selectedCountries);
 				
-				//Need min and max of all selected to set y domain
-				var selectedDimensionValues = selectedCountries.reduce(function(acc, item){
-						return acc.concat(scope.hash[item][scope.dimension]);
-					}, []);
-				y.domain(d3.extent(selectedDimensionValues));
+				//Need max of all selected to set y domain
+				var maxVal = selectedCountries.reduce(function(acc, item){
+						var val = scope.hash[item][scope.dimension];
+						return val > acc ? val : acc;
+					}, 0);
+				y.domain([0, maxVal]);
 
 				//Append axes
 				svg.append("g")
@@ -234,12 +235,11 @@ pdDirectives.directive('plot', [function() {
 			var yAxis = d3.svg.axis()
 			    .scale(y)
 			    .orient("left")
-			    .tickFormat(d3.format("r"));
+			    .ticks(9, d3.format(",r"));
 
 			var line = d3.svg.line()
 			    .x(function(d) { return x(d[0]); })	
 			    .y(function(d) { return y(d[1]); });
-
 
 			var svg = d3.select(element[0]).append("svg")
 			    .attr("width", width + margin.left + margin.right)
@@ -248,10 +248,10 @@ pdDirectives.directive('plot', [function() {
 			    	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 			
 			// Re-draw lines when set of selected countries changes
-			scope.$watch('selected', function(newVal, oldVal) {
-				if (newVal === oldVal) return;
+			scope.$watchCollection('[selected, dimension]', function(newVals, oldVals) {
+				var selectedCountries = newVals[0];
+				if (selectedCountries === null) return;
 				svg.selectAll('g g, svg path').remove();
-				var selectedCountries = newVal;
 				/**
 				 * Transform the data to combine matching data fields
 				 * across all the countries. We need to find the min and max
