@@ -39,4 +39,11 @@ pdApp.config(['$routeProvider', '$locationProvider', function($routeProvider, $l
 
 	// $locationProvider.html5Mode(true); //do enable this
 }]);
+
+pdApp.run(['$rootScope', '$location', function ($rootScope, $location) {
+    $rootScope.$on('$routeChangeSuccess', function(){
+        ga('send', 'pageview', $location.path());
+    });
+}]);
+
 })(); 
