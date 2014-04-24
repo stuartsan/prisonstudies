@@ -23,11 +23,13 @@ pdApp.config(['$routeProvider', '$locationProvider', function($routeProvider, $l
 		})
 		.when('/compare', {
 			templateUrl: 'app/partials/compare.html',
-			controller: 'CompareCtrl'
+			controller: 'CompareCtrl',
+			reloadOnSearch: false
 		})
 		.when('/trends', {
 			templateUrl: 'app/partials/trends.html',
-			controller: 'TrendsCtrl'
+			controller: 'TrendsCtrl',
+			reloadOnSearch: false
 		})
 		.when('/about', {
 			templateUrl: 'app/partials/about.html',
