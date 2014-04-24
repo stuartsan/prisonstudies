@@ -118,7 +118,7 @@ function($compile, dims, World) {
   	};
 }]);
 
-pdDirectives.directive('barChart', [function() {
+pdDirectives.directive('barChart', ['$location', function($location) {
 	return {
 		scope: {
   			dimension: '=',
@@ -133,12 +133,12 @@ pdDirectives.directive('barChart', [function() {
 
 			element.append('<h2 class="label">'+scope.label+'</h2>');
 
-			var margin = {top: 45, right: 20, bottom: 20, left: 90},
+			var margin = {top: 45, right: 20, bottom: 25, left: 90},
 			    width = 300 - margin.left - margin.right,
 			    height = 300 - margin.top - margin.bottom;
 
 			var x = d3.scale.ordinal()
-			    .rangeRoundBands([0, width], .1);
+			    .rangeRoundBands([0, width], 0.1);
 
 
 			var y = d3.scale.linear()
@@ -158,12 +158,18 @@ pdDirectives.directive('barChart', [function() {
 				.append("g")
 			    	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-			//Really do this stuff AFTER WATCHING READY TOO...
-			scope.$watch('selected', function(newVal, oldVal) {
-				if (newVal === oldVal) return;
+			scope.$watch('selected', function() {
+				if (scope.selected === null) return;
+				renderCharts();
+				if (scope.selected.length) {
+					$location.search({countries: scope.selected.join(',')});
+				}
+			});
+
+			function renderCharts() {
 				svg.selectAll('g, rect').remove();
 
-				var selectedCountries = newVal;
+				var selectedCountries = scope.selected;
 				x.domain(selectedCountries);
 				
 				//Need max of all selected to set y domain
@@ -196,14 +202,12 @@ pdDirectives.directive('barChart', [function() {
 					.attr("width", x.rangeBand())
 					.attr("y", function(d) { return y(scope.hash[d][scope.dimension]); })
 					.attr("height", function(d) { return height - y(scope.hash[d][scope.dimension]); });
-			});
-			
-
+			}
 		}
 	};
 }]);
 
-pdDirectives.directive('plot', [function() {
+pdDirectives.directive('plot', ['$location', function($location) {
 	return {
 		scope: {
   			dimension: '=',
@@ -216,7 +220,6 @@ pdDirectives.directive('plot', [function() {
 		link: function(scope, element, attrs) {
 
 			//General D3 setup
-
 			var margin = {top: 20, right: 20, bottom: 30, left: 100},
 			    width = 960 - margin.left - margin.right,
 			    height = 500 - margin.top - margin.bottom;
@@ -246,90 +249,101 @@ pdDirectives.directive('plot', [function() {
 			    .attr("height", height + margin.top + margin.bottom)
 			  	.append("g")
 			    	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-			
-			// Re-draw lines when set of selected countries changes
+
 			scope.$watchCollection('[selected, dimension]', function(newVals, oldVals) {
 				var selectedCountries = newVals[0];
 				if (selectedCountries === null) return;
-				svg.selectAll('g g, svg path').remove();
-				/**
-				 * Transform the data to combine matching data fields
-				 * across all the countries. We need to find the min and max
-				 * values for each field to calculate x and y domain.
-				 */
-				var arrayParty = selectedCountries.reduce(function(acc, item, idx){
-					return acc.concat(scope.hash[item].trend);
-				}, [])
-					.reduce(function(acc, item, idx) {
-						acc[0].push(item[0]);
-						acc[1].push(item[1]);
-						acc[2].push(item[2]);
-						return acc;
-					}, [[],[],[]]);
-
-				var allYears = arrayParty[0];
-				var allPrisoners = arrayParty[1];
-				var allPops = arrayParty[2];
 				
-				x.domain(d3.extent(allYears));
+				var dimension = newVals[1];
+				var searchParams = {dimension: dimension};
+				if (selectedCountries.length) {
+					searchParams.countries = selectedCountries.join(',');
+				} 
+				$location.search(searchParams);
+				renderPlot(selectedCountries);
+			});
 
-				y.domain(d3.extent(
-					({total_prisoners: allPrisoners, 
-					prison_pop_rate: allPops})[scope.dimension]
-				));
-
-				var label = ({total_prisoners: 'Total Prisoners', 
-					prison_pop_rate: 'People imprisoned per 100k'})[scope.dimension];
-
-				// Append axes
-				svg.append("g")
-					.attr("class", "x axis")
-					.attr("transform", "translate(0," + height + ")")
-					.call(xAxis);
-
-				svg.append("g")
-					.attr("class", "y axis")
-					.call(yAxis)
-				.append("text")
-					.attr("transform", "rotate(-90)")
-					.attr("y", 6)
-					.attr("dy", ".71em")
-					.style("text-anchor", "end")
-					.text(label);
-				
-				// For each country, plot a line.
-				selectedCountries.forEach(function(country, idx) {
-
+			function renderPlot(selectedCountries) {
+					svg.selectAll('g g, svg path').remove();
 					/**
-					 * Each trend data point is represented by an array consisting of
-					 * [year, total_prisoners, prison_pop_rate]. So depending on 
-					 * the selected dimension, we only pass along the year and one
-					 * data point representing the dimension to be plotted.
+					 * Transform the data to combine matching data fields
+					 * across all the countries. We need to find the min and max
+					 * values for each field to calculate x and y domain.
 					 */
-					var countryData = scope.hash[country].trend.map(function(item) {
-						var year = item[0],
-							dimension = ({total_prisoners: item[1], 
-										  prison_pop_rate: item[2]})[scope.dimension];
-							return [year, dimension];
-					});
+					var arrayParty = selectedCountries.reduce(function(acc, item, idx){
+						return acc.concat(scope.hash[item].trend);
+					}, [])
+						.reduce(function(acc, item, idx) {
+							acc[0].push(item[0]);
+							acc[1].push(item[1]);
+							acc[2].push(item[2]);
+							return acc;
+						}, [[],[],[]]);
 
-					// Calculate a random color for the plotted line and its corresponding
-					// item in the select2 select component
-					var randomColor = d3.scale.category20().domain(selectedCountries)(country); 
-					$('.select2-search-choice').eq(idx).css('border-color', randomColor);
+					var allYears = arrayParty[0];
+					var allPrisoners = arrayParty[1];
+					var allPops = arrayParty[2];
 					
-					svg.append("path")
-						.datum(countryData)
-						.attr("fill", "none")
-						.attr("stroke-width", "2px")
-						.attr("opacity", "0")
-						.attr("stroke", randomColor)
-						.attr("d", line)
-						.transition().duration(500)
-						.attr("opacity", "1");
+					x.domain(d3.extent(allYears));
+
+					y.domain(d3.extent(
+						({total_prisoners: allPrisoners, 
+						prison_pop_rate: allPops})[scope.dimension]
+					));
+
+					var label = ({total_prisoners: 'Total Prisoners', 
+						prison_pop_rate: 'People imprisoned per 100k'})[scope.dimension];
+
+					// Append axes
+					svg.append("g")
+						.attr("class", "x axis")
+						.attr("transform", "translate(0," + height + ")")
+						.call(xAxis);
+
+					svg.append("g")
+						.attr("class", "y axis")
+						.call(yAxis)
+					.append("text")
+						.attr("transform", "rotate(-90)")
+						.attr("y", 6)
+						.attr("dy", ".71em")
+						.style("text-anchor", "end")
+						.text(label);
+					
+					// For each country, plot a line.
+					selectedCountries.forEach(function(country, idx) {
+
+						/**
+						 * Each trend data point is represented by an array consisting of
+						 * [year, total_prisoners, prison_pop_rate]. So depending on 
+						 * the selected dimension, we only pass along the year and one
+						 * data point representing the dimension to be plotted.
+						 */
+						var countryData = scope.hash[country].trend.map(function(item) {
+							var year = item[0],
+								dimension = ({total_prisoners: item[1], 
+											  prison_pop_rate: item[2]})[scope.dimension];
+								return [year, dimension];
+						});
+
+						// Calculate a random color for the plotted line and its corresponding
+						// item in the select2 select component
+						var randomColor = d3.scale.category20().domain(selectedCountries)(country); 
+						$('.select2-search-choice').eq(idx).css('border-color', randomColor);
+						
+						svg.append("path")
+							.datum(countryData)
+							.attr("fill", "none")
+							.attr("stroke-width", "2px")
+							.attr("opacity", "0")
+							.attr("stroke", randomColor)
+							.attr("d", line)
+							.transition().duration(500)
+							.attr("opacity", "1");
 
 				});
-			});
+				
+			}
 		}
 	};
 }]);

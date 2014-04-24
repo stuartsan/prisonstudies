@@ -62,7 +62,7 @@ function($resource){
  		},
  		removePath: function(path) {
  			for (var i = 0, l = paths.length; i < l; i++) {
- 				if (paths[i]['path'] === path) {
+ 				if (paths[i].path === path) {
  					return paths.splice(i, 1);
  				}
  			}

@@ -40,23 +40,19 @@ function($scope, Country, validFilterSortDimensions) {
 	};
 }]);
 
-pdControllers.controller('CompareCtrl', ['$scope', 'Country', 'validFilterSortDimensions',
-function($scope, Country, validFilterSortDimensions) {
-	$scope.selected = null;
+pdControllers.controller('CompareCtrl', ['$scope', '$location', 'Country', 'validFilterSortDimensions',
+function($scope, $location, Country, validFilterSortDimensions) {
+	$scope.selected = $location.search().countries ? $location.search().countries.split(',') : [];
 	$scope.display = {
-		dimension: 'total_prisoners',
-		dimensions: validFilterSortDimensions,
+		dimensions: validFilterSortDimensions
 	};
-  	$scope.goDoStuff = function() {
-  		//Nothing yet!
-  	};
 }]);
 
-pdControllers.controller('TrendsCtrl', ['$scope', 'Country', 'validFilterSortDimensions',
-function($scope, Country, validFilterSortDimensions) {
-	$scope.selected = null;
+pdControllers.controller('TrendsCtrl', ['$scope', '$location', 'Country', 'validFilterSortDimensions',
+function($scope, $location, Country, validFilterSortDimensions) {
+	$scope.selected = $location.search().countries ? $location.search().countries.split(',') : [];
 	$scope.display = {
-		dimension: 'total_prisoners',
+		dimension: $location.search().dimension ? $location.search().dimension : 'total_prisoners',
 		dimensions: validFilterSortDimensions,
 	};
 }]);
