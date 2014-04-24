@@ -59,6 +59,13 @@ function($resource){
  		addPath: function(path) {
  			paths.push(path);
  			return path;
+ 		},
+ 		removePath: function(path) {
+ 			for (var i = 0, l = paths.length; i < l; i++) {
+ 				if (paths[i]['path'] === path) {
+ 					return paths.splice(i, 1);
+ 				}
+ 			}
  		}
  	};
  }); 

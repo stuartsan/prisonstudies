@@ -1,19 +1,33 @@
 'use strict';
 
-/* jasmine specs for directives go here */
-
 describe('directives', function() {
-  beforeEach(module('myApp.directives'));
+  beforeEach(module('prisonDataDirectives', 'prisonDataFilters'));
 
-  describe('app-version', function() {
-    it('should print current version', function() {
-      module(function($provide) {
-        $provide.value('version', 'TEST_VER');
-      });
-      inject(function($compile, $rootScope) {
-        var element = $compile('<span app-version></span>')($rootScope);
-        expect(element.text()).toEqual('TEST_VER');
-      });
-    });
+  describe('toolTipLink', function() {
+  	var ele, scope;
+
+  	beforeEach(inject(function($compile, $rootScope) {
+  		scope = $rootScope;
+  		ele = angular.element(
+  			'<tool-tip-link comment="cmt">' +
+  			'</tool-tip-link>'
+  		);
+  		$compile(ele)(scope);
+  		scope.$apply();
+  	}));
+
+  	it('should render a nice little question mark', function() {
+		expect(ele.html()).toContain('?');
+  	});
+
+  	it('should pass the comment attribute through to template\'s title attr',
+  		function() {
+		scope.$apply(function() {
+			scope.cmt = 'what a fun directive!';
+		});
+		expect(ele.attr('title')).toContain('fun');
+  	});
+
   });
-});
+
+ });

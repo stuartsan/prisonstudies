@@ -46,7 +46,7 @@ pdFilters.filter('fmtPer100k', function () {
 
 pdFilters.filter('naify', function () {
 	return function (x) {
-		return x || 'N/A';
+		return existy(x) ? x : 'N/A';
 	};
 });
 

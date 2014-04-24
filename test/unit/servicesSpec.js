@@ -1,14 +1,33 @@
 'use strict';
 
-/* jasmine specs for services go here */
+describe('services', function() {
+  beforeEach(module('prisonDataServices'));
 
-describe('service', function() {
-  beforeEach(module('myApp.services'));
+  describe('paths', function() {
+  	var paths;
 
+ 	beforeEach(inject(function(_paths_){
+ 		paths = _paths_;
+ 	}));
 
-  describe('version', function() {
-    it('should return current version', inject(function(version) {
-      expect(version).toEqual('0.1');
-    }));
+    it('should return a reference to all paths', function() {
+      expect(paths.paths.length).toBeGreaterThan(0);
+    });
+
+    it('should allow adding new paths', function() {
+    	var pathCount = paths.paths.length;
+    	var newPath = {path: 'awesome-path', label:'oh yeah'};
+    	paths.addPath(newPath);
+    	expect(paths.paths.length).toBeGreaterThan(pathCount);
+    });
+
+    it('and removing paths, why not', function() {
+    	var pathCount = paths.paths.length;
+    	var newPath = {path: 'awesome-path', label:'oh yeah'};
+    	paths.addPath(newPath);
+    	paths.removePath('awesome-path');
+    	expect(paths.paths.length).toEqual(pathCount);
+    });
+
   });
 });

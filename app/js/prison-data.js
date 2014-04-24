@@ -4903,7 +4903,7 @@ pdFilters.filter('fmtPer100k', function () {
 
 pdFilters.filter('naify', function () {
 	return function (x) {
-		return x || 'N/A';
+		return existy(x) ? x : 'N/A';
 	};
 });
 
@@ -4975,6 +4975,13 @@ function($resource){
  		addPath: function(path) {
  			paths.push(path);
  			return path;
+ 		},
+ 		removePath: function(path) {
+ 			for (var i = 0, l = paths.length; i < l; i++) {
+ 				if (paths[i]['path'] === path) {
+ 					return paths.splice(i, 1);
+ 				}
+ 			}
  		}
  	};
  }); 
