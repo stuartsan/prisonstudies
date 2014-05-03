@@ -29,11 +29,6 @@ module.exports = function(grunt) {
 			js: {
 				src: '<%= concat.js.dest  %>',
 				dest: 'app/js/<%= pkg.name %>.min.js'
-			},
-			css: {
-				src: '<%= concat.css.dest  %>',
-				dest: 'app/css/<%= pkg.name %>.min.css'
-
 			}
 		},
 		copy: {
@@ -59,7 +54,7 @@ module.exports = function(grunt) {
 				src: ['app/scss/*.scss'],
 				dest: 'app/css/<%= pkg.name %>.css',
 				options: {
-					outputStyle: 'nested'
+					outputStyle: 'compressed'
 				}
 			}
 		},

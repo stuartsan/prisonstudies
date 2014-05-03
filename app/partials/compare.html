@@ -1,7 +1,7 @@
 <div id="compare">
 <div class="controls">
 	<select class="multi-selector" ui-select2="{placeholder: 'Select countries...'}" multiple ng-model="selected">
-		<option ng-repeat="country in countries" ng-value="country.country_code">{{country.name}}</option>
+		<option ng-repeat="country in countries | orderBy:'name'" ng-value="country.country_code">{{country.name}}</option>
 	</select>
 </div>
 <div>
