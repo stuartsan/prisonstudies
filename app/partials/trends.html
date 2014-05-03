@@ -1,7 +1,7 @@
 <div id="trends">
 <div class="controls">
 	<select class="multi-selector" ui-select2="{placeholder: 'Select countries...'}" multiple ng-model="selected">
-		<option ng-repeat="country in countries" 
+		<option ng-repeat="country in countries | orderBy:'name'" 
 				ng-value="country.country_code"
 				ng-if="country.trend">
 				{{country.name}}
