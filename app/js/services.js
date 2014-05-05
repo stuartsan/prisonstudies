@@ -75,7 +75,7 @@ function($resource){
  */
 pdServices.value('validFilterSortDimensions', { 
 	total_prisoners: {label: 'Total prisoners', thresholds: [25000,70000,150000,700000, 2500000]},
-	prison_pop_rate: {label: 'Prison population rate (%)', thresholds: [2,50,250,600,750]},
+	prison_pop_rate: {label: 'Prison population rate (imprisoned per 100k)', thresholds: [2,50,250,600,750]},
 	female_prisoners: {label: 'Female prisoners (%)', thresholds: [1,3,6,9,14]},
 	juveniles: {label: 'Juvenile prisoners (%)', thresholds: [1,2,3,10,18]},
 	foreign_prisoners: {label: 'Foreign prisoners (%)', thresholds: [1, 3, 6, 40, 100]},
