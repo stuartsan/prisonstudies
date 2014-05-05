@@ -224,6 +224,10 @@ ul, li {
 	@include clearfix;
 	bar-chart {
 		@include threes;
+		svg {
+			position: relative;
+			top: 15px;
+		}
 	}
 	.label {
 		@include title;
