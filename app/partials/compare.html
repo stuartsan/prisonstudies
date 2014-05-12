@@ -4,7 +4,7 @@
 		<option ng-repeat="country in countries | orderBy:'name'" ng-value="country.country_code">{{country.name}}</option>
 	</select>
 </div>
-<div>
+<div id="charts">
 	<bar-chart 
 		ng-repeat="(dimensionKey, dimensionVals) in display.dimensions"
 		dimension="dimensionKey"

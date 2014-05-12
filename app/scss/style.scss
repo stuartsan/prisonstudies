@@ -53,16 +53,20 @@ ul, li {
 }
 
 @mixin threes {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
 	padding: .8em;
-	margin: 0 1% .7em 0;
+	margin: .66%;
 	background-color: darken($off-white, 10%);
 	float: left;
-	width: 30%;
-	height: 320px;
+	width: 32%;
+	height: 335px;
 	position: relative;
-	&:nth-child(3n + 3) {
-		margin-right: 0;
-	}
+}
+@mixin threes-container {
+	margin: 0 -.66%;
+	@include clearfix;
 }
 
 @mixin clearfix {
@@ -152,6 +156,12 @@ ul, li {
 	}
 	.country {
 		@include threes;
+		th {
+			text-align: left;
+		}
+	}
+	ul {
+		@include threes-container;
 	}
 	.comment-entry {
 		margin-left: 2em;
@@ -165,9 +175,6 @@ ul, li {
 			background: darken($off-white, 4%);
 		}
 	}
-	// th + td {
-	// 	text-align: right;
-	// }
 }
 
 /*
@@ -222,6 +229,9 @@ ul, li {
  */
 #compare {
 	@include clearfix;
+	#charts {
+		@include threes-container;
+	}
 	bar-chart {
 		@include threes;
 		svg {

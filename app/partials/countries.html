@@ -13,8 +13,9 @@
   </div>
   <ul>
     <li class="country" 
-        ng-repeat="country in filtered = 
-        (countries | filter:{name: textBox} | orderBy:orderFn:display.descending)">
+        ng-repeat="country in countries | orderBy:orderFn:display.descending"
+        ng-show="country.name.toLowerCase().indexOf(textBox.toLowerCase()) !== -1
+                 || textBox === undefined">
       <h2>{{ country.name }}</h2>
       <table>
         <tr>
@@ -76,6 +77,5 @@
         </tr>
       </table>
     </li>
-    <li ng-hide="filtered.length">No matching countries.</li>
   </ul>
 </div>
