@@ -271,7 +271,9 @@ pdDirectives.directive('plot', ['$location', function($location) {
 					 * values for each field to calculate x and y domain.
 					 */
 					var arrayParty = selectedCountries.reduce(function(acc, item, idx){
-						return acc.concat(scope.hash[item].trend);
+						var trend = scope.hash[item].trend;
+						trend = (typeof trend === 'string') ? JSON.parse(trend) : trend;
+						return acc.concat(trend);
 					}, [])
 						.reduce(function(acc, item, idx) {
 							acc[0].push(item[0]);
@@ -319,7 +321,9 @@ pdDirectives.directive('plot', ['$location', function($location) {
 						 * the selected dimension, we only pass along the year and one
 						 * data point representing the dimension to be plotted.
 						 */
-						var countryData = scope.hash[country].trend.map(function(item) {
+						var trend = scope.hash[country].trend;
+						trend = (typeof trend === 'string') ? JSON.parse(trend) : trend;
+						var countryData = trend.map(function(item) {
 							var year = item[0],
 								dimension = ({total_prisoners: item[1], 
 											  prison_pop_rate: item[2]})[scope.dimension];
