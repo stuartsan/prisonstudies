@@ -13,19 +13,59 @@ var pdServices = angular.module('prisonDataServices', ['ngResource']);
  */
 pdServices.factory('Country', ['$resource',
 function($resource){
+	var FEED_URL = 'http://prisonstudies.org/sites/prisonstudies.org' +
+				   '/tool/app/dataexport.json';
+	var parseFloatNum = function(n) {
+		var res = parseFloat(n, 10);
+		if (isNaN(res)) return null;
+		return res;
+	};
+	var parseJSON = function(x) {
+			if (!x) return null;
+			return JSON.parse(x);
+	};
+	var transformFields = {
+		country_code: function(x) {
+			return x.toUpperCase();
+		},
+		female_prisoners: parseFloatNum,
+		juveniles: parseFloatNum,
+		foreign_prisoners: parseFloatNum,
+		nid: parseFloatNum,
+		occupancy_level: parseFloatNum,
+		official_capacity: parseFloatNum,
+		pretrial_detainee_rate: parseFloatNum,
+		prison_pop_rate: parseFloatNum,
+		total_prisoners: parseFloatNum,
+		total_establishments: parseFloatNum,
+		trend: parseJSON 
+	};
+	var mapFields = function(data) {
+		var res = {};
+		angular.forEach(data, function(val, key) {
+			res[key] = (key in transformFields) ?
+				transformFields[key](val) : val;
+		});
+		return res;
+	};
     return $resource('app/data.json', {/* default params */}, {
       	query: {
       		method: 'GET',
       		cache: true,
-      		isArray: true
+      		isArray: true,
+      		transformResponse: function(data) {
+      			return JSON.parse(data).map(mapFields);
+      		}
       	},
     	queryHash: {
     		method: 'GET', 
       		cache: true,
       		transformResponse: function(data) {
       			return JSON.parse(data).reduce(function(acc, item) {
-					acc[item.country_code] = item;
-					delete acc[item.country_code].country_code;
+					var mapped = mapFields(item);
+					var key = mapped.country_code;
+					delete mapped.country_code;
+					acc[key] = mapped;
 					return acc;
 				}, {});
       		}

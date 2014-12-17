@@ -21,6 +21,7 @@ function($scope, $location, paths) {
 
 pdControllers.controller('CountryListCtrl', ['$scope', 'Country', 'validFilterSortDimensions', 
 function($scope, Country, validFilterSortDimensions){
+	$scope.psoBaseURL = 'http://prisonstudies.org/node/';
 	$scope.display = {
 		dimension: 'total_prisoners',
 		dimensions: validFilterSortDimensions,
