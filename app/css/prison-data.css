@@ -1,1 +1,197 @@
-body{background-color:black;color:#3f3f3f;font-family:helvetica,arial;}h1,h2,h3,h4,h5,h6{font-family:courier;font-weight:normal;margin:0.3em 0;}a:link,a:visited{text-decoration:none;color:black;font-weight:bold;}input,textarea{outline:none;}ul,li{list-style:none;padding:0;margin:0;}#main{background-color:#e5e5e5;padding:1em;}#site-title{margin:0.8em 0.3em;font-size:1.8em;}#site-title a{color:#a5a5a5;font-weight:normal;}#nav{padding:0;margin:0;list-style:none;}#nav li{display:inline-block;border-top-left-radius:0.3em;border-top-right-radius:0.3em;padding:0.5em 1em;background-color:#f7f7f7;}#nav li a{display:block;width:100%;height:100%;color:#404040;}#nav li.active{background-color:#e5e5e5;}#nav li.active a{color:black;}.controls{background-color:#bfbfbf;padding:0.7em 0.5em;margin-bottom:1em;border-radius:0.8em;}.multi-selector{width:80%;}#countries:before,#countries:after{content:" ";display:table;}#countries:after{clear:both;}#countries input[type="text"]{width:20em;}#countries table{width:100%;}#countries .country{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;padding:0.8em;margin:0.66%;background-color:#cccccc;float:left;width:32%;height:335px;position:relative;}#countries .country th{text-align:left;}#countries ul{margin:0 -0.66%;}#countries ul:before,#countries ul:after{content:" ";display:table;}#countries ul:after{clear:both;}#countries .comment-entry{margin-left:2em;font-weight:bold;background:#e5e5e5;padding:0em 0.3em;border-radius:1em;float:right;}#countries .comment-entry:hover{cursor:pointer;background:#dbdbdb;}#map .na{fill:gray;background-color:grey;}#map .q0{fill:#fef0d9;background-color:#fef0d9;}#map .q1{fill:#fdcc8a;background-color:#fdcc8a;}#map .q2{fill:#fc8d59;background-color:#fc8d59;}#map .q3{fill:#e34a33;background-color:#e34a33;}#map .q4{fill:#b30000;background-color:#b30000;}#map .country:hover{fill-opacity:0.7;transition:fill-opacity 0.2s linear;cursor:pointer;}#map .legend .thresholds{padding:0 0 1em 0;}#map .legend .threshold{display:inline-block;margin-right:1.3em;}#map .legend .box{display:inline-block;height:1em;width:1em;border:solid 1px #3f3f3f;}.axis path,.axis line{fill:none;stroke:#000;shape-rendering:crispEdges;}#compare:before,#compare:after{content:" ";display:table;}#compare:after{clear:both;}#compare #charts{margin:0 -0.66%;}#compare #charts:before,#compare #charts:after{content:" ";display:table;}#compare #charts:after{clear:both;}#compare bar-chart{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;padding:0.8em;margin:0.66%;background-color:#cccccc;float:left;width:32%;height:335px;position:relative;}#compare bar-chart svg{position:relative;top:15px;}#compare .label{background-color:black;color:#d6d6d6;padding:5px;position:absolute;top:0;left:0;right:0;margin:0;font-size:1.3em;}
+/*
+ * Variables
+ */
+/* Typography */
+/* Colors */
+/*
+ * General styles
+ */
+body {
+  background-color: black;
+  color: #3f3f3f;
+  font-family: helvetica, arial; }
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: courier;
+  font-weight: normal;
+  margin: 0.3em 0; }
+
+a:link, a:visited {
+  text-decoration: none;
+  color: black;
+  font-weight: bold; }
+
+input, textarea {
+  outline: none; }
+
+ul, li {
+  list-style: none;
+  padding: 0;
+  margin: 0; }
+
+#main {
+  background-color: #e5e5e5;
+  padding: 1em; }
+
+#site-title {
+  margin: 0.8em 0.3em;
+  font-size: 1.8em; }
+  #site-title a {
+    color: #a5a5a5;
+    font-weight: normal; }
+
+#nav {
+  padding: 0;
+  margin: 0;
+  list-style: none; }
+  #nav li {
+    display: inline-block;
+    border-top-left-radius: 0.3em;
+    border-top-right-radius: 0.3em;
+    padding: 0.5em 1em;
+    background-color: #f7f7f7; }
+    #nav li a {
+      display: block;
+      width: 100%;
+      height: 100%;
+      color: #404040; }
+    #nav li.active {
+      background-color: #e5e5e5; }
+      #nav li.active a {
+        color: black; }
+
+.controls {
+  background-color: #bfbfbf;
+  padding: 0.7em 0.5em;
+  margin-bottom: 1em;
+  border-radius: 0.8em; }
+
+.multi-selector {
+  width: 80%; }
+
+/*
+ * Country List
+ */
+#countries:before, #countries:after {
+  content: " ";
+  display: table; }
+#countries:after {
+  clear: both; }
+#countries input[type="text"] {
+  width: 20em; }
+#countries table {
+  width: 100%; }
+#countries .country {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  padding: 0.8em;
+  margin: 0.66%;
+  background-color: #cccccc;
+  float: left;
+  width: 32%;
+  height: 335px;
+  position: relative; }
+  #countries .country th {
+    text-align: left; }
+#countries ul {
+  margin: 0 -0.66%; }
+  #countries ul:before, #countries ul:after {
+    content: " ";
+    display: table; }
+  #countries ul:after {
+    clear: both; }
+#countries .comment-entry {
+  margin-left: 2em;
+  font-weight: bold;
+  background: #e5e5e5;
+  padding: 0em 0.3em;
+  border-radius: 1em;
+  float: right; }
+  #countries .comment-entry:hover {
+    cursor: pointer;
+    background: #dbdbdb; }
+
+/*
+ * D3 map
+ */
+#map .na {
+  fill: gray;
+  background-color: grey; }
+#map .q0 {
+  fill: #fef0d9;
+  background-color: #fef0d9; }
+#map .q1 {
+  fill: #fdcc8a;
+  background-color: #fdcc8a; }
+#map .q2 {
+  fill: #fc8d59;
+  background-color: #fc8d59; }
+#map .q3 {
+  fill: #e34a33;
+  background-color: #e34a33; }
+#map .q4 {
+  fill: #b30000;
+  background-color: #b30000; }
+#map .country:hover {
+  fill-opacity: 0.7;
+  transition: fill-opacity 0.2s linear;
+  cursor: pointer; }
+#map .legend .thresholds {
+  padding: 0 0 1em 0; }
+#map .legend .threshold {
+  display: inline-block;
+  margin-right: 1.3em; }
+#map .legend .box {
+  display: inline-block;
+  height: 1em;
+  width: 1em;
+  border: solid 1px #3f3f3f; }
+
+/**
+ * Trends
+ */
+.axis path, .axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges; }
+
+/**
+ * Compare
+ */
+#compare:before, #compare:after {
+  content: " ";
+  display: table; }
+#compare:after {
+  clear: both; }
+#compare #charts {
+  margin: 0 -0.66%; }
+  #compare #charts:before, #compare #charts:after {
+    content: " ";
+    display: table; }
+  #compare #charts:after {
+    clear: both; }
+#compare bar-chart {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  padding: 0.8em;
+  margin: 0.66%;
+  background-color: #cccccc;
+  float: left;
+  width: 32%;
+  height: 335px;
+  position: relative; }
+  #compare bar-chart svg {
+    position: relative;
+    top: 15px; }
+#compare .label {
+  background-color: black;
+  color: #d6d6d6;
+  padding: 5px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  margin: 0;
+  font-size: 1.3em; }

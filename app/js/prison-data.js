@@ -4497,11 +4497,12 @@ pdApp.config(['$routeProvider', '$locationProvider', function($routeProvider, $l
 
 pdApp.run(['$rootScope', '$location', function ($rootScope, $location) {
     $rootScope.$on('$routeChangeSuccess', function(){
-        ga('send', 'pageview', $location.path());
+        if (window.ga) ga('send', 'pageview', $location.path());
     });
 }]);
 
 })(); 
+
 (function () {		
 'use strict';
 

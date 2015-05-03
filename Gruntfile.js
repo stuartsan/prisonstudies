@@ -50,9 +50,13 @@ module.exports = function(grunt) {
 			}
 		},
 		sass: {
-			build: {
+			dev: {
 				src: ['app/scss/*.scss'],
 				dest: 'app/css/<%= pkg.name %>.css',
+			},
+			prod: {
+				src: ['app/scss/*.scss'],
+				dest: 'app/css/<%= pkg.name %>.min.css',
 				options: {
 					outputStyle: 'compressed'
 				}
@@ -64,7 +68,7 @@ module.exports = function(grunt) {
 			},
 			sass: {
 				files: 'app/scss/*.scss',
-				tasks: 'sass:build'
+				tasks: 'sass:dev'
 			},
 			js: {
 				files: ['app/js/**/*.js', '!app/js/prison-data.js', '!app/js/prison-data.min.js'],
@@ -83,7 +87,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-contrib-copy');
 
-	grunt.registerTask('default', ['sass', 'jshint', 'concat', 'copy']);
-	grunt.registerTask('prod', ['sass', 'jshint', 'uglify', 'concat', 'jshint']);
+	grunt.registerTask('default', ['sass:dev', 'jshint', 'concat', 'copy']);
+	grunt.registerTask('prod', ['sass:prod', 'jshint', 'uglify', 'concat', 'jshint']);
 
 };

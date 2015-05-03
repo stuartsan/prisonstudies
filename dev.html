@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html ng-app="prisonDataApp" ng-cloak ng-controller="MainCtrl">
+<head>
+  <title>Worldwide Incarceration Data</title>
+  <link rel="stylesheet" type="text/css" href="app/css/vendor/select2/select2.css">
+  <link rel="stylesheet" type="text/css" href="app/css/prison-data.css">
+  <meta name="viewport" content="width=1280">
+</head>
+<body>
+  <div id="page">
+    <h1 id="site-title"><a ng-href="#">Prison Data</a></h1>
+    <ul id="nav" ng-controller="navCtrl">
+      <li ng-repeat="path in paths" ng-class="setClass(path.path)"><a ng-href="#{{path.path}}">{{path.label}}</a></li>
+    </ul>
+    <div id="main" ng-view></div>
+  </div>
+  <script src="app/js/prison-data.js"></script>
+</body>
+</html>
