@@ -140,17 +140,15 @@ ul, li {
 }
 
 .multi-selector {
-	width: 80%;
+	width: 100%;
 }
+
 /*
  * Country List
  */
 
 #countries {
 	@include clearfix;
-	input[type="text"] {
-		width: 20em;
-	}
 	table {
 		width: 100%;
 	}
@@ -180,7 +178,6 @@ ul, li {
 /*
  * D3 map
  */
-
 
 #map {
 	.na { fill: gray; background-color: $map-not-available-color; }
@@ -243,7 +240,3 @@ ul, li {
 		@include title;
 	}
 }
-
-
-
-

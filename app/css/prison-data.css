@@ -67,7 +67,7 @@ ul, li {
   border-radius: 0.8em; }
 
 .multi-selector {
-  width: 80%; }
+  width: 100%; }
 
 /*
  * Country List
@@ -77,8 +77,6 @@ ul, li {
   display: table; }
 #countries:after {
   clear: both; }
-#countries input[type="text"] {
-  width: 20em; }
 #countries table {
   width: 100%; }
 #countries .country {

@@ -1,21 +1,29 @@
 <div id="countries">
   <div class="controls">
-    <input type="text" ng-model="textBox" placeholder="Start typing a country name..." autofocus/>
-    <span>Sort by:</span>
-    <select ng-model="display.dimension"
-            ng-options="k as v.label for (k, v) in display.dimensions">
-    </select>
-    <span>From:</span>
-    <select ng-model="display.descending">
-      <option value="true">Highest</option>
-      <option value="false">Lowest</option>
-    </select>
+	<select class="multi-selector" autofocus ui-select2="{placeholder: 'Select countries...'}" multiple ng-model="selected">
+		<option ng-repeat="country in countries | orderBy:'name'" 
+				ng-value="country.country_code"
+				ng-if="country.trend">
+				{{country.name}}
+		</option>
+	</select>
+	<div>
+		<span>Sort by:</span>
+		<select ng-model="display.dimension"
+				ng-options="k as v.label for (k, v) in display.dimensions">
+		</select>
+		<span>From:</span>
+		<select ng-model="display.descending">
+		  <option value="true">Highest</option>
+		  <option value="false">Lowest</option>
+		</select>
+	</div>
   </div>
   <ul>
     <li class="country" 
         ng-repeat="country in countries | orderBy:orderFn:display.descending"
-        ng-show="country.name.toLowerCase().indexOf(textBox.toLowerCase()) !== -1
-                 || textBox === undefined">
+		ng-show="selected.indexOf(country.country_code) !== -1 || 
+		selected.length === 0">
       <h2>{{ country.name }}</h2>
       <table>
         <tr>
