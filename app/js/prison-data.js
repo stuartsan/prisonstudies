@@ -4526,6 +4526,7 @@ function($scope, $location, paths) {
 
 pdControllers.controller('CountryListCtrl', ['$scope', 'Country', 'validFilterSortDimensions', 
 function($scope, Country, validFilterSortDimensions){
+	$scope.psoBaseURL = 'http://prisonstudies.org/node/';
 	$scope.display = {
 		dimension: 'total_prisoners',
 		dimensions: validFilterSortDimensions,
@@ -4647,7 +4648,7 @@ function($compile, dims, World) {
 					domain = dims[dimension].thresholds,
 					colorScale = d3.scale.threshold().domain(domain).range(['q0', 'q1', 'q2', 'q3', 'q4']),
 					assignCountryClass = function(obj) {
-						return assignClass.call(null, dimension, colorScale, getProp('properties.adm0_a3')(obj));
+						return assignClass.call(null, dimension, colorScale, getProp('properties.iso_a2')(obj));
 					};
 
 				if (!ready) return; 
@@ -4665,7 +4666,7 @@ function($compile, dims, World) {
 							.data(countries)
 							.enter().append('path')
 								.attr('class', assignCountryClass)
-								.attr('cc', getProp('properties.adm0_a3'))
+								.attr('cc', getProp('properties.iso_a2'))
 								.attr('d', path);
 					});
 				} 
@@ -4844,7 +4845,6 @@ pdDirectives.directive('plot', ['$location', function($location) {
 					 */
 					var arrayParty = selectedCountries.reduce(function(acc, item, idx){
 						var trend = scope.hash[item].trend;
-						trend = (typeof trend === 'string') ? JSON.parse(trend) : trend;
 						return acc.concat(trend);
 					}, [])
 						.reduce(function(acc, item, idx) {
@@ -4894,7 +4894,6 @@ pdDirectives.directive('plot', ['$location', function($location) {
 						 * data point representing the dimension to be plotted.
 						 */
 						var trend = scope.hash[country].trend;
-						trend = (typeof trend === 'string') ? JSON.parse(trend) : trend;
 						var countryData = trend.map(function(item) {
 							var year = item[0],
 								dimension = ({total_prisoners: item[1], 
@@ -5000,19 +4999,59 @@ var pdServices = angular.module('prisonDataServices', ['ngResource']);
  */
 pdServices.factory('Country', ['$resource',
 function($resource){
+	var FEED_URL = 'http://prisonstudies.org/sites/prisonstudies.org' +
+				   '/tool/app/dataexport.json';
+	var parseFloatNum = function(n) {
+		var res = parseFloat(n, 10);
+		if (isNaN(res)) return null;
+		return res;
+	};
+	var parseJSON = function(x) {
+			if (!x) return null;
+			return JSON.parse(x);
+	};
+	var transformFields = {
+		country_code: function(x) {
+			return x.toUpperCase();
+		},
+		female_prisoners: parseFloatNum,
+		juveniles: parseFloatNum,
+		foreign_prisoners: parseFloatNum,
+		nid: parseFloatNum,
+		occupancy_level: parseFloatNum,
+		official_capacity: parseFloatNum,
+		pretrial_detainee_rate: parseFloatNum,
+		prison_pop_rate: parseFloatNum,
+		total_prisoners: parseFloatNum,
+		total_establishments: parseFloatNum,
+		trend: parseJSON 
+	};
+	var mapFields = function(data) {
+		var res = {};
+		angular.forEach(data, function(val, key) {
+			res[key] = (key in transformFields) ?
+				transformFields[key](val) : val;
+		});
+		return res;
+	};
     return $resource('app/data.json', {/* default params */}, {
       	query: {
       		method: 'GET',
       		cache: true,
-      		isArray: true
+      		isArray: true,
+      		transformResponse: function(data) {
+      			return JSON.parse(data).map(mapFields);
+      		}
       	},
     	queryHash: {
     		method: 'GET', 
       		cache: true,
       		transformResponse: function(data) {
       			return JSON.parse(data).reduce(function(acc, item) {
-					acc[item.country_code] = item;
-					delete acc[item.country_code].country_code;
+					var mapped = mapFields(item);
+					var key = mapped.country_code;
+					delete mapped.country_code;
+					acc[key] = mapped;
 					return acc;
 				}, {});
       		}
