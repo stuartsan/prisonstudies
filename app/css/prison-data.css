@@ -193,3 +193,10 @@ ul, li {
   right: 0;
   margin: 0;
   font-size: 1.3em; }
+
+/** 
+  Allow angular.js to be loaded in body, hiding cloaked elements until 
+  templates compile.
+ */
+[ng\:cloak], [ng-cloak], .ng-cloak {
+  display: none !important; }

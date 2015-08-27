@@ -240,3 +240,11 @@ ul, li {
 		@include title;
 	}
 }
+
+/** 
+  Allow angular.js to be loaded in body, hiding cloaked elements until 
+  templates compile.
+ */
+[ng\:cloak], [ng-cloak], .ng-cloak {
+  display: none !important;
+}
